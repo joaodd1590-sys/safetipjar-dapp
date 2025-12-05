@@ -1,44 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafeTipJar DApp</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SafeTipJar — ARC Testnet</title>
+
+    <!-- Ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist/ethers.min.js"></script>
+
+    <style>
+        body {
+            background: #0d0d16;
+            font-family: Arial, sans-serif;
+            color: #e1e8ff;
+            margin: 0;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .card {
+            max-width: 420px;
+            padding: 20px;
+            background: #151520;
+            border-radius: 14px;
+            margin: auto;
+            border: 1px solid #2b2b3d;
+        }
+
+        button {
+            background: #7c3aed;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #5b22c4;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #8cd4ff;
+            word-break: break-all;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>SafeTipJar DApp</h1>
 
-  <button id="connectButton">Connect Wallet</button>
-  <p id="status"></p>
+    <h1>SafeTipJar — ARC Testnet</h1>
 
-  <script>
-    const connectButton = document.getElementById("connectButton");
-    const statusText = document.getElementById("status");
+    <div class="card">
+        <h3>Connect to MetaMask</h3>
+        <button onclick="connectWallet()">Connect Wallet</button>
+        <p id="status">Wallet not connected</p>
+    </div>
 
-    // Connect MetaMask
-    connectButton.addEventListener("click", async () => {
-      if (typeof window.ethereum === "undefined") {
-        statusText.innerText = "MetaMask not detected!";
-        alert("MetaMask not detected — install it first.");
-        return;
-      }
-
-      try {
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts"
-        });
-
-        const wallet = accounts[0];
-        statusText.innerText = `Connected: ${wallet}`;
-        console.log("Wallet connected:", wallet);
-
-      } catch (error) {
-        console.error(error);
-        statusText.innerText = "Connection failed!";
-      }
-    });
-  </script>
-
+    <script src="script.js"></script>
 </body>
+
 </html>
