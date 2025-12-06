@@ -15,12 +15,21 @@ export default async function handler(req, res) {
     }
 
     const txs = json.result.map(tx => {
-      const valueEth = Number(tx.value || "0") / 1e18;
+      let raw = tx.value || "0";
+
+      // converter hex → número
+      if (typeof raw === "string" && raw.startsWith("0x")) {
+        raw = parseInt(raw, 16);
+      }
+
+      // USDC = 6 decimais
+      const usdcValue = Number(raw) / 1e6;
+
       return {
         hash: tx.hash,
         from: tx.from,
         to: tx.to,
-        value: valueEth.toFixed(4) + " ETH",
+        value: usdcValue.toFixed(4), // AGORA USDC ESTÁ CERTO
         time: new Date(Number(tx.timeStamp) * 1000).toLocaleString(),
         link: `https://testnet.arcscan.app/tx/${tx.hash}`,
         timeStamp: Number(tx.timeStamp)
