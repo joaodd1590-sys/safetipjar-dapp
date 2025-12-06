@@ -1,151 +1,282 @@
-:root{
-  --bg:#05030a;
-  --neon-cyan:#6cf2c2;
-  --neon-pink:#ff4db8;
-  --muted:#8f98a6;
-  --accent: linear-gradient(90deg,var(--neon-cyan),var(--neon-pink));
+/* ============================================================
+   GLOBAL VARIABLES
+============================================================ */
+:root {
+    --bg:#05030a;
+    --neon-cyan:#6cf2c2;
+    --neon-pink:#ff4db8;
+    --muted:#8f98a6;
+    --accent: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
 }
 
-*{box-sizing:border-box;}
+* { box-sizing: border-box; }
 
-body{
-  margin:0;
-  background:linear-gradient(180deg,#02020a,var(--bg));
-  font-family:Inconsolata,monospace;
-  color:#e6eef6;
+body {
+    margin:0;
+    background:linear-gradient(180deg,#02020a,var(--bg));
+    font-family:"Inconsolata", monospace;
+    color:#e6eef6;
 }
 
-.wrap{
-  max-width:1200px;
-  margin:28px auto;
-  padding:22px;
-  display:grid;
-  grid-template-columns:1fr 420px;
-  gap:22px;
+/* ============================================================
+   LAYOUT WRAPPER
+============================================================ */
+.wrap {
+    max-width:1200px;
+    margin:28px auto;
+    padding:22px;
+    display:grid;
+    grid-template-columns:1fr 420px;
+    gap:22px;
 }
 
-.panel{
-  background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
-  border-radius:12px;
-  padding:18px;
-  border:1px solid rgba(255,255,255,0.04);
+.panel {
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+    border-radius:12px;
+    padding:18px;
+    border:1px solid rgba(108,242,194,0.04);
 }
 
-.snapshot-panel{height:fit-content;align-self:flex-start;}
-
-.term-title{
-  font-family:Orbitron;
-  color:var(--neon-cyan);
-  font-size:22px;
+/* Right panel */
+.snapshot-panel {
+    height:fit-content;
+    align-self:flex-start;
 }
 
-.term-sub{
-  color:var(--muted);
-  font-size:13px;
+/* ============================================================
+   TITLES
+============================================================ */
+.term-title {
+    font-family:"Orbitron";
+    color:var(--neon-cyan);
+    font-size:22px;
 }
 
-.input-row{
-  display:flex;
-  gap:10px;
-  margin:12px 0 18px 0 !important;
+.term-sub {
+    color:var(--muted);
+    font-size:12px;
 }
 
-.address{
-  flex:1;
-  padding:12px;
-  background:rgba(0,0,0,0.35);
-  border:none;
-  border-radius:8px;
-  color:white;
+/* ============================================================
+   INPUT + BUTTON
+============================================================ */
+.input-row {
+    display:flex;
+    gap:10px;
+    margin:12px 0;
 }
 
-.action{
-  background:var(--accent);
-  border:none;
-  padding:12px 22px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:700;
+input.address {
+    flex:1;
+    padding:14px;
+    border-radius:8px;
+    border:none;
+    background:rgba(0,0,0,0.35);
+    color:#e6eef6;
+    font-size:14px;
 }
 
-.small{font-size:12px;color:var(--muted);margin-top:6px;}
-
-.summary{
-  display:flex;
-  gap:12px;
-  margin-top:18px;
+button.action {
+    min-width:140px;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    background:var(--accent);
+    cursor:pointer;
+    color:#041017;
+    font-weight:700;
+    font-size:14px;
 }
 
-.stat{
-  padding:10px;
-  background:rgba(255,255,255,0.02);
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,0.03);
-  min-width:120px;
+/* ============================================================
+   SUMMARY BOXES
+============================================================ */
+.summary {
+    display:flex;
+    gap:12px;
+    margin-top:12px;
+    flex-wrap:wrap;
 }
 
-.label{font-size:12px;color:var(--muted);}
-.num{font-weight:700;color:var(--neon-cyan);margin-top:6px;}
-
-.terminal{
-  margin-top:18px;
-  min-height:260px;
-  background:rgba(255,255,255,0.02);
-  padding:12px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,0.03);
-  overflow:auto;
+.stat {
+    background:rgba(255,255,255,0.02);
+    padding:10px;
+    border-radius:8px;
+    min-width:120px;
+    border:1px solid rgba(255,255,255,0.03);
 }
 
-.side-title{
-  font-family:Orbitron;
-  font-size:20px;
-  color:var(--neon-pink);
-  margin-bottom:15px;
+.stat .label {
+    color:var(--muted);
+    font-size:12px;
 }
 
-.snapshot .row{
-  display:flex;
-  justify-content:space-between;
-  padding:8px 0;
-  border-bottom:1px dashed rgba(255,255,255,0.04);
+.stat .num {
+    color:var(--neon-cyan);
+    font-weight:700;
+    margin-top:6px;
 }
 
-.copy{
-  display:flex;
-  gap:10px;
-  margin-top:15px;
+/* ============================================================
+   TERMINAL (TRANSACTION LIST)
+============================================================ */
+.terminal {
+    margin-top:14px;
+    background:rgba(255,255,255,0.02);
+    border-radius:10px;
+    padding:12px;
+    min-height:260px;
+    max-height:460px;
+    overflow-y:auto;
+    border:1px solid rgba(255,255,255,0.03);
 }
 
-.copy button{
-  flex:1;
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  background:var(--accent);
-  color:#041017;
-  cursor:pointer;
-  font-weight:700;
+/* Single transaction row */
+.tx {
+    padding:10px 8px;
+    border-bottom:1px dashed rgba(255,255,255,0.05);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
 }
 
-.expl{
-  background:#111 !important;
-  border:1px solid rgba(255,255,255,0.08);
-  color:var(--neon-pink) !important;
+.tx:last-child { border-bottom:none; }
+
+.tx .left {
+    flex:1;
+    min-width:0;
 }
 
-.badge-out{
-  padding:4px 10px;
-  border-radius:12px;
-  background:linear-gradient(90deg,#ff4db8,#ff84c8);
-  color:black;
-  font-weight:700;
+/* Hash */
+.hash {
+    color:var(--neon-pink);
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:520px;
 }
 
-.badge-in{
-  padding:4px 10px;
-  border-radius:12px;
-  background:linear-gradient(90deg,#6cf2c2,#9effe8);
-  color:black;
-  font-weight:700;
+/* Metadata */
+.meta {
+    color:var(--muted);
+    font-size:12px;
+    margin-top:6px;
+}
+
+/* Action buttons */
+.actions {
+    display:flex;
+    gap:8px;
+}
+
+.btn-ghost {
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.08);
+    padding:8px 10px;
+    border-radius:8px;
+    color:var(--muted);
+    cursor:pointer;
+    font-size:12px;
+    transition:0.15s;
+}
+
+.btn-ghost:hover {
+    border-color:var(--neon-cyan);
+    color:var(--neon-cyan);
+}
+
+/* IN / OUT badges */
+.badge-in {
+    background:linear-gradient(90deg,#00ffad,#6cf2c2);
+    color:#041017;
+    padding:6px 10px;
+    border-radius:20px;
+    font-weight:700;
+    font-size:12px;
+}
+
+.badge-out {
+    background:linear-gradient(90deg,#ff4db8,#ff9bd1);
+    color:#041017;
+    padding:6px 10px;
+    border-radius:20px;
+    font-weight:700;
+    font-size:12px;
+}
+
+/* ============================================================
+   SNAPSHOT PANEL
+============================================================ */
+.side-title {
+    font-family:Orbitron;
+    color:var(--neon-pink);
+    font-size:18px;
+    margin-bottom:8px;
+}
+
+.snapshot {
+    padding:12px;
+    background:rgba(255,255,255,0.01);
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.03);
+}
+
+.snapshot .row {
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px dashed rgba(255,255,255,0.03);
+}
+.snapshot .row:last-child { border-bottom:none; }
+
+.copy {
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+}
+
+.copy button {
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    background:var(--accent);
+    color:#041017;
+    font-weight:700;
+    cursor:pointer;
+}
+
+/* ============================================================
+   LEADERBOARD COMING SOON
+============================================================ */
+.lb-coming {
+    margin-top:16px;
+    padding:14px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.04);
+    color:var(--neon-cyan);
+    font-size:16px;
+    font-family:"Orbitron";
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.lb-soon-text {
+    margin-top:6px;
+    font-size:12px;
+    color:var(--muted);
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width:980px) {
+    .wrap {
+        grid-template-columns:1fr;
+        padding:16px;
+    }
 }
