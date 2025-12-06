@@ -5,54 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARC ACTIVITY</title>
 
-    <link rel="icon" href="/favicon.png">
-
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Roboto+Mono&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <div class="header">
-        <h1>ARC ACTIVITY</h1>
-        <p>Live scanner – shows Arc Testnet activity</p>
-    </div>
+    <div class="container">
 
-    <div class="main-input">
-        <input id="walletInput" placeholder="0x... wallet address">
-        <button id="scanBtn">Run Scan</button>
-    </div>
+        <h1 class="title">ARC ACTIVITY TRACKER</h1>
+        <p class="subtitle">Community scanner – shows live activity on Arc Testnet</p>
 
-    <div id="scanStatus" class="status-box">Waiting...</div>
+        <div class="scan-area">
+            <input id="walletInput" placeholder="0x... wallet address" />
+            <button id="scanBtn">Run Scan</button>
+        </div>
 
-    <div id="content" class="content hidden">
+        <p class="rpc-note">Uses ArcScan API via server backend. No wallet signatures required.</p>
 
-        <!-- Snapshot -->
-        <div class="card">
-            <h2>Wallet Snapshot</h2>
+        <div class="main-columns">
 
-            <div class="snapshot-line"><b>Wallet:</b> <span id="snapAddress">-</span></div>
-            <div class="snapshot-line"><b>Network:</b> Arc Testnet</div>
-            <div class="snapshot-line"><b>Tx Count:</b> <span id="snapTxCount">0</span></div>
-            <div class="snapshot-line"><b>Active:</b> <span id="snapActive">No</span></div>
+            <!-- LEFT SIDE -->
+            <div class="left-panel">
 
-            <div class="snapshot-actions">
-                <button id="copyProfile">Copy Profile Link</button>
-                <button id="openArcScan">Open in ArcScan</button>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <label>Total Transactions</label>
+                        <span id="totalTx">0</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>First Tx</label>
+                        <span id="firstTx">--</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>Last Tx</label>
+                        <span id="lastTx">--</span>
+                    </div>
+
+                    <div class="stat-box">
+                        <label>Status</label>
+                        <span id="activityStatus" class="active-text">ACTIVE</span>
+                    </div>
+                </div>
+
+                <!-- LISTA DE TRANSAÇÕES -->
+                <div id="txList" class="tx-list">
+                    No transactions yet.
+                </div>
+
             </div>
-        </div>
 
-        <!-- TRANSACTION LIST -->
-        <div class="card">
-            <h2>Transaction Activity</h2>
-            <div id="txList">No transactions yet.</div>
-        </div>
+            <!-- RIGHT SIDE -->
+            <div class="right-panel">
 
-        <!-- LEADERBOARD -->
-        <div class="card">
-            <h2>Top Active Wallets</h2>
-            <button id="refreshLB" class="refresh-btn">Refresh</button>
-            <div id="leaderboard">Loading…</div>
+                <h2>Wallet Snapshot</h2>
+
+                <div class="snapshot-line"><b>Wallet:</b> <span id="snapAddress">-</span></div>
+                <div class="snapshot-line"><b>Network:</b> Arc Testnet</div>
+                <div class="snapshot-line"><b>Tx Count:</b> <span id="snapTxCount">0</span></div>
+
+                <div class="snapshot-line">
+                    <b>Active:</b> <span id="snapActive" class="badge-no">No</span>
+                </div>
+
+                <div class="actions">
+                    <button id="copyProfile">Copy Profile Link</button>
+                    <button id="openArcScan">Open in ArcScan</button>
+                </div>
+
+                <h3>Top Active Wallets</h3>
+
+                <button class="refreshLB" id="refreshLB">Refresh</button>
+
+                <div id="leaderboard" class="leaderboard-box">
+                    Loading leaderboard…
+                </div>
+
+            </div>
         </div>
 
     </div>
