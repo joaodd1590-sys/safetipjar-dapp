@@ -6,50 +6,41 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing wallet address" });
     }
 
-    const rpcUrl = "https://rpc.testnet.arc.network";
+    // Endpoint da API do ArcScan (estilo Etherscan)
+    const apiUrl = `https://testnet.arcscan.app/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc`;
 
-    // ⚠️ ENDEREÇO DO CONTRATO USDC NA ARC TESTNET
-    // Se a ARC mudar isso depois, a gente só atualiza aqui
-    const USDC_CONTRACT = "0x0000000000000000000000000000000000000000"; 
-    // 👉 Se você souber o endereço real do USDC da Arc, me manda que eu coloco exato
+    const response = await fetch(apiUrl);
+    const data = await response.json();
 
-    // balanceOf(address)
-    const paddedAddress = address.toLowerCase().replace("0x", "").padStart(64, "0");
-    const data = "0x70a08231" + paddedAddress; 
-    // 0x70a08231 = função balanceOf
+    if (!data || data.status !== "1") {
+      return res.status(200).json({
+        address,
+        network: "Arc Testnet",
+        transactions: [],
+        message: "No transactions found yet"
+      });
+    }
 
-    const payload = {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "eth_call",
-      params: [
-        {
-          to: USDC_CONTRACT,
-          data: data
-        },
-        "latest"
-      ]
-    };
-
-    const response = await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    const rawBalance = result.result ? parseInt(result.result, 16) : 0;
+    // Normalizando as transações
+    const txs = data.result.map((tx) => ({
+      hash: tx.hash,
+      from: tx.from,
+      to: tx.to,
+      value: tx.value,
+      time: new Date(tx.timeStamp * 1000).toLocaleString("pt-BR"),
+      link: `https://testnet.arcscan.app/tx/${tx.hash}`
+    }));
 
     return res.status(200).json({
       address,
-      usdc: rawBalance / 1e6, // USDC geralmente usa 6 casas decimais
-      network: "Arc Testnet"
+      network: "Arc Testnet",
+      totalTx: txs.length,
+      transactions: txs
     });
 
   } catch (err) {
     return res.status(500).json({
-      error: "USDC RPC error",
+      error: "ArcScan API error",
       details: err.message
     });
   }
