@@ -1,119 +1,179 @@
-// =========================
-// CONFIG
-// =========================
-const API_BASE = "https://arc-backend-production.up.railway.app";
-let userAddress = "";
+// ===============================
+// ARC ACTIVITY TRACKER - FRONTEND
+// ===============================
 
+// Pega elementos do DOM
+const addrInput     = document.getElementById("addr");
+const checkBtn      = document.getElementById("check");
+const terminal      = document.getElementById("terminal");
+const summary       = document.getElementById("summary");
+const tcountEl      = document.getElementById("tcount");
+const firstEl       = document.getElementById("first");
+const lastEl        = document.getElementById("last");
+const statusEl      = document.getElementById("status");
+const snapWalletEl  = document.getElementById("snapWallet");
+const snapTxEl      = document.getElementById("snapTx");
+const snapActiveEl  = document.getElementById("snapActive");
+const copyLinkBtn   = document.getElementById("copyLink");
+const openExpBtn    = document.getElementById("openExplorer");
 
-// =========================
-// HELPERS
-// =========================
-
-// Remove " ARC" e converte para número real
-function cleanNumber(str) {
-    if (!str) return 0;
-    return parseFloat(str.replace(" ARC", "").trim());
+// Helper: limpa terminal
+function clearTerminal() {
+  terminal.innerHTML = "";
 }
 
-// Formata endereço para exibir
+// Helper: encurta endereço
 function shortAddr(addr) {
-    return addr.slice(0, 6) + "..." + addr.slice(-4);
+  if (!addr || addr.length < 10) return addr || "--";
+  return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
+// Renderiza UMA transação no terminal
+function appendTx(tx, wallet) {
+  const row = document.createElement("div");
+  row.className = "tx";
 
-// =========================
-// LOAD WALLET DATA
-// =========================
-async function loadWallet() {
-    const input = document.getElementById("wallet-input");
-    const address = input.value.trim();
+  const wLower = wallet.toLowerCase();
+  const fromLower = (tx.from || "").toLowerCase();
+  const toLower   = (tx.to || "").toLowerCase();
 
-    if (!address) {
-        alert("Enter a valid wallet address.");
-        return;
+  let direction = "";
+  if (fromLower === wLower) direction = "OUT";
+  else if (toLower === wLower) direction = "IN";
+  else direction = "-";
+
+  const badge =
+    direction === "IN"
+      ? `<span class="badge-in">IN</span>`
+      : direction === "OUT"
+      ? `<span class="badge-out">OUT</span>`
+      : "";
+
+  const fromText = tx.from || "--";
+  const toText   = tx.to   || "--";
+
+  // Aqui usamos o TOTAL calculado pelo backend (valor + gas)
+  const totalText = tx.total || tx.value || "0 ARC";
+
+  row.innerHTML = `
+    <div class="left">
+      <div class="hash">${tx.hash}</div>
+      <div class="meta">
+        ${fromText} → ${toText}
+        • Total: ${totalText}
+        • ${tx.time}
+      </div>
+    </div>
+    <div class="actions">
+      ${badge}
+      <button class="btn-ghost" onclick="navigator.clipboard.writeText('${tx.hash}')">Copy</button>
+      <button class="btn-ghost" onclick="window.open('${tx.link}','_blank')">Explorer</button>
+    </div>
+  `;
+
+  // Mais recente em cima
+  terminal.prepend(row);
+}
+
+// Função principal: faz o scan
+async function runScan() {
+  const wallet = addrInput.value.trim();
+
+  if (!wallet || !wallet.startsWith("0x") || wallet.length < 40) {
+    alert("Paste a valid Arc Testnet wallet (0x...)");
+    return;
+  }
+
+  // Feedback visual
+  terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Scanning Arc Testnet...</div>`;
+  summary.style.display = "none";
+
+  // Atualiza snapshot com o endereço
+  snapWalletEl.textContent = shortAddr(wallet);
+  snapTxEl.textContent = "0";
+  snapActiveEl.innerHTML = `<span class="badge-out">No</span>`;
+
+  try {
+    const resp = await fetch(`/api/activity?address=${encodeURIComponent(wallet)}`);
+    if (!resp.ok) {
+      terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Server error ${resp.status}</div>`;
+      return;
     }
 
-    userAddress = address;
-    document.getElementById("wallet-address").innerHTML = shortAddr(address);
+    const data = await resp.json();
+    const txs = data.transactions || [];
+    const total = txs.length;
 
-    await loadActivity(address);
-}
+    // Atualiza resumo
+    tcountEl.textContent = total.toString();
+    snapTxEl.textContent = total.toString();
 
+    if (total > 0) {
+      // json já vem em ordem desc (mais recente primeiro)
+      const newest = txs[0];
+      const oldest = txs[txs.length - 1];
 
-// =========================
-// LOAD ACTIVITY (Transactions)
-// =========================
-async function loadActivity(address) {
-    try {
-        const res = await fetch(`${API_BASE}/activity/${address}`);
-        const data = await res.json();
-
-        if (!data?.transactions) {
-            document.getElementById("activity-list").innerHTML =
-                "<div class='no-data'>No transactions found</div>";
-            return;
-        }
-
-        renderActivity(data.transactions);
-
-    } catch (err) {
-        console.error("Activity load error:", err);
-        document.getElementById("activity-list").innerHTML =
-            "<div class='no-data'>Error loading activity</div>";
+      firstEl.textContent  = oldest.time || "--";
+      lastEl.textContent   = newest.time || "--";
+      statusEl.textContent = "ACTIVE";
+      statusEl.style.color = "#00ff9c";
+      snapActiveEl.innerHTML = `<span class="badge-in">Yes</span>`;
+    } else {
+      firstEl.textContent  = "--";
+      lastEl.textContent   = "--";
+      statusEl.textContent = "NO ACTIVITY";
+      statusEl.style.color = "#ff6b6b";
+      snapActiveEl.innerHTML = `<span class="badge-out">No</span>`;
     }
+
+    summary.style.display = "flex";
+
+    // Renderiza lista
+    clearTerminal();
+
+    if (!txs.length) {
+      terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">No transactions found for this wallet.</div>`;
+      return;
+    }
+
+    txs.forEach(tx => appendTx(tx, wallet));
+
+  } catch (err) {
+    console.error("SCAN ERROR:", err);
+    terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Network error while contacting backend.</div>`;
+  }
 }
 
-
-// =========================
-// RENDER TRANSACTIONS
-// =========================
-function renderActivity(transactions) {
-    const list = document.getElementById("activity-list");
-    list.innerHTML = "";
-
-    transactions.forEach(tx => {
-        const value = cleanNumber(tx.value).toFixed(6);
-        const gas = cleanNumber(tx.gas).toFixed(6);
-        const total = cleanNumber(tx.total).toFixed(6);
-
-        const direction =
-            tx.from.toLowerCase() === userAddress.toLowerCase()
-                ? "OUT"
-                : "IN";
-
-        const item = document.createElement("div");
-        item.className = "activity-item";
-
-        item.innerHTML = `
-            <div class="activity-row">
-                <span class="type ${direction.toLowerCase()}">${direction}</span>
-                <span class="value">${value} ARC</span>
-            </div>
-
-            <div class="activity-info">
-                <span>Gas: ${gas} ARC</span>
-                <span>Total: ${total} ARC</span>
-            </div>
-
-            <div class="activity-meta">
-                <span>${tx.time}</span>
-                <a href="${tx.link}" target="_blank">Open</a>
-            </div>
-        `;
-
-        list.appendChild(item);
-    });
-}
-
-
-// =========================
-// BUTTON LISTENERS
-// =========================
-
-// Run Scan button
-document.getElementById("run-scan").addEventListener("click", loadWallet);
-
-// ENTER key triggers scan
-document.getElementById("wallet-input").addEventListener("keypress", e => {
-    if (e.key === "Enter") loadWallet();
+// Copy Profile Link
+copyLinkBtn?.addEventListener("click", () => {
+  const wallet = addrInput.value.trim();
+  if (!wallet) return;
+  const url = `${location.origin}/?addr=${encodeURIComponent(wallet)}`;
+  navigator.clipboard.writeText(url);
+  alert("Profile link copied");
 });
+
+// Open in ArcScan
+openExpBtn?.addEventListener("click", () => {
+  const wallet = addrInput.value.trim();
+  if (!wallet) return;
+  window.open(`https://testnet.arcscan.app/address/${wallet}`, "_blank");
+});
+
+// Botão Run Scan
+checkBtn.addEventListener("click", runScan);
+
+// Enter no input também dispara
+addrInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") runScan();
+});
+
+// Se vier ?addr= na URL, já carrega
+(function autoloadFromQuery() {
+  const params = new URLSearchParams(location.search);
+  const a = params.get("addr");
+  if (a && a.startsWith("0x") && a.length > 40) {
+    addrInput.value = a;
+    runScan();
+  }
+})();
