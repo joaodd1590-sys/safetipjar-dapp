@@ -9,15 +9,12 @@ const LOOKBACK = Number(process.env.LOOKBACK_BLOCKS || 500);
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false }});
 const provider = new ethers.JsonRpcProvider(RPC_URL);
 
-// USDC Testnet contract (Arc Testnet)
-const USDC_ADDRESS = "0x63a131657cdc57865df571e2e61e2eff6ee0c1c8"; // substitua pelo contrato oficial USDC quando soubermos
 const TRANSFER_TOPIC = ethers.id("Transfer(address,address,uint256)");
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    // Último bloco salvo
     const { data: last } = await db
       .from("transactions")
       .select("block_number")
@@ -26,12 +23,11 @@ export default async function handler(req, res) {
       .maybeSingle();
 
     const latestIndexed = last?.block_number ?? 0;
-    const currentBlock = await provider.getBlockNumber();
+    const current = await provider.getBlockNumber();
 
-    const fromBlock = latestIndexed ? latestIndexed + 1 : currentBlock - LOOKBACK;
-    const toBlock = currentBlock;
+    const fromBlock = latestIndexed ? latestIndexed + 1 : current - LOOKBACK;
+    const toBlock = current;
 
-    // Buscar logs de Transfer
     const logs = await provider.getLogs({
       fromBlock,
       toBlock,
@@ -41,18 +37,29 @@ export default async function handler(req, res) {
     const rows = [];
 
     for (const log of logs) {
-      const parsed = ethers.AbiCoder.defaultAbiCoder().decode(
-        ["address", "address", "uint256"],
-        log.data
-      );
+      // Decode addresses from topics (always 32-byte padded)
+      const from = "0x" + log.topics[1].slice(26);
+      const to = "0x" + log.topics[2].slice(26);
+
+      // Value may be in data OR may be empty — ARC logs sometimes break standard
+      let value = "0";
+
+      try {
+        value = ethers.toBigInt(log.data || "0x0").toString();
+      } catch {
+        value = "0";
+      }
+
+      const block = await provider.getBlock(log.blockNumber);
+      const timestamp = new Date(block.timestamp * 1000).toISOString();
 
       rows.push({
         id: log.transactionHash,
-        from_address: "0x" + log.topics[1].slice(26),
-        to_address: "0x" + log.topics[2].slice(26),
-        value: parsed[2].toString(),
+        from_address: from,
+        to_address: to,
+        value: value,
         block_number: log.blockNumber,
-        block_timestamp: new Date((await provider.getBlock(log.blockNumber)).timestamp * 1000).toISOString(),
+        block_timestamp: timestamp,
         network: "arc-testnet"
       });
     }
@@ -63,7 +70,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       ok: true,
-      indexed: rows.length,
+      captured: rows.length,
       fromBlock,
       toBlock
     });
