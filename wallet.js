@@ -1,9 +1,72 @@
-// Remove " ARC" e converte corretamente
+// =========================
+// CONFIG
+// =========================
+const API_BASE = "https://arc-backend-production.up.railway.app";
+let userAddress = "";
+
+
+// =========================
+// HELPERS
+// =========================
+
+// Remove " ARC" e converte para número real
 function cleanNumber(str) {
     if (!str) return 0;
     return parseFloat(str.replace(" ARC", "").trim());
 }
 
+// Formata endereço para exibir
+function shortAddr(addr) {
+    return addr.slice(0, 6) + "..." + addr.slice(-4);
+}
+
+
+// =========================
+// LOAD WALLET DATA
+// =========================
+async function loadWallet() {
+    const input = document.getElementById("wallet-input");
+    const address = input.value.trim();
+
+    if (!address) {
+        alert("Enter a valid wallet address.");
+        return;
+    }
+
+    userAddress = address;
+    document.getElementById("wallet-address").innerHTML = shortAddr(address);
+
+    await loadActivity(address);
+}
+
+
+// =========================
+// LOAD ACTIVITY (Transactions)
+// =========================
+async function loadActivity(address) {
+    try {
+        const res = await fetch(`${API_BASE}/activity/${address}`);
+        const data = await res.json();
+
+        if (!data?.transactions) {
+            document.getElementById("activity-list").innerHTML =
+                "<div class='no-data'>No transactions found</div>";
+            return;
+        }
+
+        renderActivity(data.transactions);
+
+    } catch (err) {
+        console.error("Activity load error:", err);
+        document.getElementById("activity-list").innerHTML =
+            "<div class='no-data'>Error loading activity</div>";
+    }
+}
+
+
+// =========================
+// RENDER TRANSACTIONS
+// =========================
 function renderActivity(transactions) {
     const list = document.getElementById("activity-list");
     list.innerHTML = "";
@@ -13,12 +76,13 @@ function renderActivity(transactions) {
         const gas = cleanNumber(tx.gas).toFixed(6);
         const total = cleanNumber(tx.total).toFixed(6);
 
+        const direction =
+            tx.from.toLowerCase() === userAddress.toLowerCase()
+                ? "OUT"
+                : "IN";
+
         const item = document.createElement("div");
         item.className = "activity-item";
-
-        const direction = tx.from.toLowerCase() === userAddress.toLowerCase()
-            ? "OUT"
-            : "IN";
 
         item.innerHTML = `
             <div class="activity-row">
@@ -40,3 +104,16 @@ function renderActivity(transactions) {
         list.appendChild(item);
     });
 }
+
+
+// =========================
+// BUTTON LISTENERS
+// =========================
+
+// Run Scan button
+document.getElementById("run-scan").addEventListener("click", loadWallet);
+
+// ENTER key triggers scan
+document.getElementById("wallet-input").addEventListener("keypress", e => {
+    if (e.key === "Enter") loadWallet();
+});
