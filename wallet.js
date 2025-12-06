@@ -52,8 +52,8 @@ function appendTx(tx, wallet) {
   const fromText = tx.from || "--";
   const toText   = tx.to   || "--";
 
-  // Aqui usamos o TOTAL calculado pelo backend (valor + gas)
-  const totalText = tx.total || tx.value || "0 ARC";
+  // Aqui usamos o TOTAL calculado pelo backend
+  const totalText = tx.total || tx.value || "0 USDC";
 
   row.innerHTML = `
     <div class="left">
@@ -71,7 +71,6 @@ function appendTx(tx, wallet) {
     </div>
   `;
 
-  // Mais recente em cima
   terminal.prepend(row);
 }
 
@@ -84,7 +83,6 @@ async function runScan() {
     return;
   }
 
-  // Feedback visual
   terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Scanning Arc Testnet...</div>`;
   summary.style.display = "none";
 
@@ -109,7 +107,6 @@ async function runScan() {
     snapTxEl.textContent = total.toString();
 
     if (total > 0) {
-      // json já vem em ordem desc (mais recente primeiro)
       const newest = txs[0];
       const oldest = txs[txs.length - 1];
 
@@ -128,7 +125,6 @@ async function runScan() {
 
     summary.style.display = "flex";
 
-    // Renderiza lista
     clearTerminal();
 
     if (!txs.length) {
@@ -177,3 +173,14 @@ addrInput.addEventListener("keydown", e => {
     runScan();
   }
 })();
+
+// ======================================
+// CYBERPUNK GLOW FOLLOWING MOUSE
+// ======================================
+
+const glow = document.getElementById("cyberGlow");
+
+document.addEventListener("mousemove", (e) => {
+  glow.style.left = `${e.clientX}px`;
+  glow.style.top = `${e.clientY}px`;
+});
