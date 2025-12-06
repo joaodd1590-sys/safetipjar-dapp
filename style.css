@@ -2,7 +2,7 @@
    GLOBAL THEME
 =========================================== */
 :root {
-  --bg: #05030a;
+  --bg: #02020a;
   --neon-cyan: #6cf2c2;
   --neon-pink: #ff4db8;
   --muted: #8f98a6;
@@ -15,9 +15,43 @@
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #02020a, var(--bg));
+  background: #02020a; /* Fundo sólido sem gradiente */
   font-family: Inconsolata, monospace;
   color: #e6eef6;
+  overflow-x: hidden;
+}
+
+/* ===========================================
+   CYBERPUNK GLOW FOLLOW MOUSE
+=========================================== */
+#cyberGlow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 260px;
+  pointer-events: none;
+
+  background: radial-gradient(circle,
+    rgba(108, 242, 194, 0.28) 0%,
+    rgba(255, 77, 184, 0.25) 35%,
+    rgba(0,0,0,0) 70%
+  );
+
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(40px);
+  opacity: 0.8;
+
+  transform: translate(-130px, -130px);
+  transition: opacity 0.25s ease-out;
+  z-index: 0;
+}
+
+/* Faz o glow sumir quando mouse está sobre qualquer painel */
+.panel:hover ~ #cyberGlow,
+.panel:hover + #cyberGlow {
+  opacity: 0;
 }
 
 /* ===========================================
@@ -30,25 +64,20 @@ body {
   display: grid;
   grid-template-columns: 1fr 420px;
   gap: 22px;
+  position: relative;
+  z-index: 2;
 }
 
 /* ===========================================
    PANELS
 =========================================== */
 .panel {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   padding: 18px;
   border: 1px solid rgba(108, 242, 194, 0.04);
-}
-
-.snapshot-panel {
-  height: fit-content;
-  align-self: flex-start;
+  position: relative;
+  z-index: 3;
 }
 
 /* ===========================================
@@ -125,7 +154,7 @@ button.action {
 }
 
 /* ===========================================
-   TRANSACTION TERMINAL
+   TERMINAL
 =========================================== */
 .terminal {
   margin-top: 16px;
@@ -138,15 +167,6 @@ button.action {
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Scroll bonito */
-.terminal::-webkit-scrollbar {
-  width: 8px;
-}
-.terminal::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
 /* ===========================================
    TRANSACTION ROWS
 =========================================== */
@@ -157,11 +177,6 @@ button.action {
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-}
-
-.tx .left {
-  flex: 1;
-  min-width: 0;
 }
 
 .hash {
@@ -179,32 +194,18 @@ button.action {
   margin-top: 6px;
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-/* ===========================================
-   BADGES IN / OUT — (Centralized Perfectly)
-=========================================== */
-.badge-in,
-.badge-out {
+/* BADGES */
+.badge-in, .badge-out {
   display: flex;
   align-items: center;
   justify-content: center;
-
   min-width: 50px;
   height: 30px;
-
   padding: 0 12px;
   border-radius: 18px;
-
   font-weight: 700;
   font-size: 12px;
   color: #041017;
-
-  white-space: nowrap;
 }
 
 .badge-in {
@@ -216,25 +217,13 @@ button.action {
 }
 
 /* ===========================================
-   SIMPLE BUTTONS
-=========================================== */
-.btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-/* ===========================================
    SNAPSHOT
 =========================================== */
+
 .side-title {
   font-family: Orbitron;
-  color: var(--neon-pink);
   font-size: 18px;
-  margin-bottom: 8px;
+  color: var(--neon-pink);
 }
 
 .snapshot {
@@ -255,25 +244,8 @@ button.action {
   border-bottom: none;
 }
 
-.copy {
-  margin-top: 14px;
-  display: flex;
-  gap: 8px;
-}
-
-.copy button {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: var(--accent);
-  color: #041017;
-  font-weight: 700;
-  cursor: pointer;
-}
-
 /* ===========================================
-   LEADERBOARD — COMING SOON
+   LEADERBOARD SECTION
 =========================================== */
 .lb-coming {
   margin-top: 18px;
