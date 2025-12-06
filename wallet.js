@@ -1,205 +1,163 @@
-// Helpers
+// =======================================================
+// ARC Activity Tracker - Frontend Logic (FINAL VERSION)
+// =======================================================
+
 const $ = sel => document.querySelector(sel);
 
-const addrInput   = $("#addr");
-const runBtn      = $("#check");
-const terminal    = $("#terminal");
-const summaryBox  = $("#summary");
-const tcountEl    = $("#tcount");
-const firstEl     = $("#first");
-const lastEl      = $("#last");
-const statusEl    = $("#status");
+const addrInput = $("#addr");
+const checkBtn = $("#check");
 
-const snapWallet  = $("#snapWallet");
-const snapTx      = $("#snapTx");
-const snapActive  = $("#snapActive");
+const summary = $("#summary");
+const tcount = $("#tcount");
+const first = $("#first");
+const last = $("#last");
+const statusEl = $("#status");
 
-const copyLinkBtn = $("#copyLink");
-const openExpBtn  = $("#openExplorer");
+const terminal = $("#terminal");
 
-const lbLimitSel  = $("#lbLimit");
-const lbRefresh   = $("#refreshLB");
-const lbContainer = $("#leaderboard");
+const snapWallet = $("#snapWallet");
+const snapTx = $("#snapTx");
+const snapActive = $("#snapActive");
 
-const copyToast   = $("#copyToast");
+const copyLink = $("#copyLink");
+const openExplorer = $("#openExplorer");
 
-function showToast(msg="Copied!") {
+// copy toast
+const copyToast = $("#copyToast");
+function showToast(msg = "Copied!") {
   copyToast.textContent = msg;
   copyToast.classList.add("show");
-  setTimeout(() => copyToast.classList.remove("show"), 1300);
-}
-
-function setTerminalPlaceholder(text) {
-  terminal.innerHTML = `<div class="placeholder">${text}</div>`;
+  setTimeout(() => copyToast.classList.remove("show"), 1200);
 }
 
 function clearTerminal() {
   terminal.innerHTML = "";
 }
 
-function appendTx(html) {
+function appendLine(html) {
   const div = document.createElement("div");
   div.className = "tx";
   div.innerHTML = html;
   terminal.appendChild(div);
 }
 
-// MAIN SCAN
+// =======================================================
+// RUN SCAN
+// =======================================================
 async function runScan() {
-  const addr = addrInput.value.trim();
-  if (!addr || !addr.startsWith("0x") || addr.length < 40) {
-    alert("Paste a valid Arc Testnet address (0x...)");
+  const wallet = addrInput.value.trim();
+
+  if (!wallet.startsWith("0x") || wallet.length < 40) {
+    alert("Paste a valid Arc Testnet wallet (0x...)");
     return;
   }
 
-  setTerminalPlaceholder("Scanning activity on Arc Testnet...");
-  summaryBox.style.display = "none";
+  summary.style.display = "none";
+
+  snapWallet.textContent = wallet;
+
+  terminal.innerHTML = `<div style="padding:12px;color:#999">Scanning...</div>`;
 
   try {
-    const resp = await fetch(`/api/activity?address=${encodeURIComponent(addr)}`);
-    if (!resp.ok) {
-      setTerminalPlaceholder(`Server error: ${resp.status}`);
+    const res = await fetch(`/api/activity?address=${wallet}`);
+    if (!res.ok) {
+      terminal.innerHTML = `<div style="padding:12px;color:#999">Server error: ${res.status}</div>`;
       return;
     }
-    const data = await resp.json();
+
+    const data = await res.json();
     const txs = data.transactions || [];
     const total = txs.length;
 
-    // Snapshot
-    snapWallet.textContent = addr;
+    // Update Snapshot
     snapTx.textContent = total;
-
-    // Status + summary
-    tcountEl.textContent = total;
     if (total > 0) {
-      firstEl.textContent = txs[txs.length - 1].time;
-      lastEl.textContent  = txs[0].time;
-      statusEl.textContent = "ACTIVE";
-      statusEl.style.color = "#6cf2c2";
-      snapActive.innerHTML = '<span class="badge-in">Yes</span>';
+      snapActive.innerHTML = `<span class="badge-in">Yes</span>`;
     } else {
-      firstEl.textContent = "--";
-      lastEl.textContent  = "--";
-      statusEl.textContent = "NO ACTIVITY";
-      statusEl.style.color = "#ff4db8";
-      snapActive.innerHTML = '<span class="badge-out">No</span>';
+      snapActive.innerHTML = `<span class="badge-out">No</span>`;
     }
-    summaryBox.style.display = "flex";
 
-    // Render TXs
+    // Update Summary
+    tcount.textContent = total;
+    first.textContent = total ? txs[txs.length - 1].time : "--";
+    last.textContent = total ? txs[0].time : "--";
+
+    statusEl.textContent = total > 0 ? "ACTIVE" : "NO ACTIVITY";
+    statusEl.style.color = total > 0 ? "#00ffa5" : "#ff6b6b";
+
+    summary.style.display = "flex";
+
     clearTerminal();
+
     if (!txs.length) {
-      setTerminalPlaceholder("No transactions found for this wallet.");
+      terminal.innerHTML = `<div style="padding:12px;color:#888">No transactions yet.</div>`;
       return;
     }
 
-    const lower = addr.toLowerCase();
-    txs.forEach(tx => {
-      const fromMe = tx.from.toLowerCase() === lower;
-      const direction = fromMe ? "OUT" : "IN";
-      const badge = fromMe
-        ? '<span class="badge-out">OUT</span>'
-        : '<span class="badge-in">IN</span>';
+    // =======================================================
+    // RENDER TRANSACTIONS (exactly like original layout)
+    // =======================================================
+    for (const tx of txs) {
+      const valueUSDC = Number(tx.value) / 1e6; // USDC DECIMALS (6)
+      const direction = tx.from.toLowerCase() === wallet.toLowerCase() ? "OUT" : "IN";
+
+      const badge =
+        direction === "IN"
+          ? `<span class="badge-in">IN</span>`
+          : `<span class="badge-out">OUT</span>`;
 
       const html = `
         <div class="left">
           <div class="hash">${tx.hash}</div>
-          <div class="meta">${tx.from} → ${tx.to} • ${tx.value} • ${tx.time}</div>
-        </div>
-        <div class="actions">
-          ${badge}
-          <button class="btn-ghost" onclick="navigator.clipboard.writeText('${tx.hash}').then(()=>window.__toast && window.__toast())">Copy</button>
-          <button class="btn-ghost" onclick="window.open('${tx.link}','_blank')">Explorer</button>
-        </div>
-      `;
-      appendTx(html);
-    });
-
-  } catch (e) {
-    console.error(e);
-    setTerminalPlaceholder("Network error while fetching activity.");
-  }
-}
-
-// Leaderboard
-async function loadLeaderboard() {
-  lbContainer.innerHTML = `<div class="placeholder">Loading leaderboard...</div>`;
-  try {
-    const resp = await fetch(`/api/leaderboard`);
-    if (!resp.ok) {
-      lbContainer.innerHTML = `<div class="placeholder">Leaderboard error: ${resp.status}</div>`;
-      return;
-    }
-    const data = await resp.json();
-    const limit = Number(lbLimitSel.value || 50);
-    const list = (data.top || []).slice(0, limit);
-
-    if (!list.length) {
-      lbContainer.innerHTML = `<div class="placeholder">No data.</div>`;
-      return;
-    }
-
-    lbContainer.innerHTML = "";
-    list.forEach((w, i) => {
-      const row = document.createElement("div");
-      row.className = "lb-row";
-      row.innerHTML = `
-        <div class="lb-left">
-          <div class="lb-rank">${i + 1}</div>
-          <div>
-            <div class="lb-addr">${w.address}</div>
-            <div class="lb-meta">txs: ${w.count}</div>
+          <div class="meta">
+            ${tx.from} → ${tx.to} • ${valueUSDC.toFixed(4)} USDC • ${tx.time}
           </div>
         </div>
-        <button class="view-btn" data-addr="${w.address}">View</button>
+
+        <div class="actions">
+          ${badge}
+          <button class="btn-ghost" onclick="navigator.clipboard.writeText('${tx.hash}').then(()=>showToast('Copied!'))">Copy</button>
+          <button class="btn-ghost" onclick="window.open('${tx.link}', '_blank')">Explorer</button>
+        </div>
       `;
-      lbContainer.appendChild(row);
-    });
 
-    [...lbContainer.querySelectorAll(".view-btn")].forEach(btn => {
-      btn.onclick = e => {
-        const a = e.currentTarget.dataset.addr;
-        addrInput.value = a;
-        runScan();
-      };
-    });
+      appendLine(html);
+    }
 
-  } catch (e) {
-    console.error(e);
-    lbContainer.innerHTML = `<div class="placeholder">Error loading leaderboard.</div>`;
+  } catch (err) {
+    console.error(err);
+    terminal.innerHTML = `<div style="padding:12px;color:#999">Network error.</div>`;
   }
 }
 
-// Toast acesso global pro onclick inline
-window.__toast = () => showToast("Copied!");
-
-// Eventos
-runBtn.onclick = runScan;
-addrInput.onkeydown = e => { if (e.key === "Enter") runScan(); };
-
-copyLinkBtn.onclick = () => {
-  const addr = addrInput.value.trim();
-  if (!addr) return;
-  const link = `${window.location.origin}/?addr=${addr}`;
-  navigator.clipboard.writeText(link).then(() => showToast("Profile link copied"));
+// =======================================================
+// EVENTS
+// =======================================================
+checkBtn.onclick = runScan;
+addrInput.onkeydown = e => {
+  if (e.key === "Enter") runScan();
 };
 
-openExpBtn.onclick = () => {
-  const addr = addrInput.value.trim();
-  if (!addr) return;
-  window.open(`https://testnet.arcscan.app/address/${addr}`,"_blank");
+copyLink.onclick = () => {
+  const w = addrInput.value.trim();
+  if (!w) return;
+  navigator.clipboard.writeText(`${location.origin}/?addr=${w}`);
+  showToast("Profile link copied");
 };
 
-lbRefresh.onclick = () => loadLeaderboard();
-lbLimitSel.onchange = () => loadLeaderboard();
+openExplorer.onclick = () => {
+  const w = addrInput.value.trim();
+  if (!w) return;
+  window.open(`https://arcscan.io/address/${w}`, "_blank");
+};
 
-// Auto load ?addr= e leaderboard
-(function init(){
-  const params = new URLSearchParams(window.location.search);
-  const addr = params.get("addr");
-  if (addr && addr.startsWith("0x")) {
-    addrInput.value = addr;
+// =======================================================
+// AUTOLOAD ?addr= PARAM
+// =======================================================
+(function () {
+  const a = new URLSearchParams(location.search).get("addr");
+  if (a && a.startsWith("0x")) {
+    addrInput.value = a;
     runScan();
   }
-  loadLeaderboard();
 })();
