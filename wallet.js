@@ -1,46 +1,56 @@
 const scanBtn = document.getElementById("scanBtn");
 const walletInput = document.getElementById("walletInput");
-const results = document.getElementById("results");
-const statusBox = document.getElementById("statusBox");
+
+const statusBox = document.getElementById("scanStatus");
+const content = document.getElementById("content");
 
 scanBtn.onclick = async () => {
-    const address = walletInput.value.trim();
-    if (!address) return alert("Enter a wallet address");
 
-    statusBox.textContent = "Scanning…";
+    const address = walletInput.value.trim();
+    if (!address) {
+        alert("Enter a wallet address.");
+        return;
+    }
+
+    statusBox.textContent = "Scanning Arc Testnet…";
 
     const res = await fetch(`/api/activity?address=${address}`);
     const data = await res.json();
 
     if (!data || data.error) {
-        statusBox.textContent = "Error fetching activity.";
+        statusBox.textContent = "Error while scanning.";
         return;
     }
 
+    /** SNAPSHOT **/
     document.getElementById("snapAddress").textContent = address;
-    document.getElementById("snapCount").textContent = data.total;
+    document.getElementById("snapTxCount").textContent = data.total;
     document.getElementById("snapActive").textContent = data.total > 0 ? "Yes" : "No";
 
-    // load tx list
+    /** TX LIST **/
     const txList = document.getElementById("txList");
     txList.innerHTML = "";
 
+    if (data.transactions.length === 0) {
+        txList.innerHTML = "<p>No transactions found.</p>";
+    }
+
     data.transactions.forEach(tx => {
-        const div = document.createElement("div");
-        div.className = "tx-item";
-        div.innerHTML = `
-            <b>${tx.hash.slice(0,12)}...</b>  
-            <br>From: ${tx.from}  
-            <br>To: ${tx.to}  
-            <br>Value: ${tx.value}  
-            <br>Time: ${tx.time}
-            <br><button onclick="copy('${tx.hash}')">Copy Hash</button>
-            <button onclick="window.open('https://testnet.arcscan.app/tx/${tx.hash}')">Explorer</button>
+        txList.innerHTML += `
+            <div class="tx-item">
+                <div class="tx-hash">${tx.hash.slice(0,12)}...</div>
+                <div>From: ${tx.from}</div>
+                <div>To: ${tx.to}</div>
+                <div>Value: ${tx.value}</div>
+                <div>Time: ${tx.time}</div>
+
+                <button onclick="copy('${tx.hash}')">Copy Hash</button>
+                <button onclick="openTx('${tx.hash}')">Explorer</button>
+            </div>
         `;
-        txList.appendChild(div);
     });
 
-    results.classList.remove("hidden");
+    content.classList.remove("hidden");
     statusBox.textContent = "Scan complete.";
 };
 
@@ -48,3 +58,17 @@ function copy(text) {
     navigator.clipboard.writeText(text);
     alert("Copied!");
 }
+
+function openTx(hash) {
+    window.open(`https://testnet.arcscan.app/tx/${hash}`);
+}
+
+document.getElementById("copyProfile").onclick = () => {
+    const url = `https://testnet.arcscan.app/address/${walletInput.value}`;
+    navigator.clipboard.writeText(url);
+    alert("Profile link copied!");
+};
+
+document.getElementById("openArcScan").onclick = () => {
+    window.open(`https://testnet.arcscan.app/address/${walletInput.value}`);
+};
