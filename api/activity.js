@@ -6,35 +6,52 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Invalid address" });
     }
 
-    // ArcScan API correta
-    const url = `https://api.arcscan.app/v1/txs/address/${address}?limit=50`;
-    const response = await fetch(url);
-    const data = await response.json();
+    const url = `https://testnet.arcscan.app/api?module=account&action=txlist&address=${address}&sort=desc`;
+    const r = await fetch(url);
+    const json = await r.json();
 
-    if (!data || !data.items) {
-      return res.status(500).json({ error: "ArcScan API error", raw: data });
+    if (!json || !json.result) {
+      return res.status(200).json({ address, total: 0, transactions: [] });
     }
 
-    // A API JÁ RETORNA value / gas / total formatados como texto
-    const formatted = data.items.map((tx) => ({
-      hash: tx.hash,
-      from: tx.from,
-      to: tx.to,
-      value: tx.value.replace("ARC", "USDC"),
-      gas: tx.gas.replace("ARC", "USDC"),
-      total: tx.total.replace("ARC", "USDC"),
-      time: tx.timestamp,
-      link: `https://testnet.arcscan.app/tx/${tx.hash}`
-    }));
+    const txs = json.result.map(tx => {
+      // VALUE (BigInt)
+      let rawValue = tx.value || "0";
+      if (rawValue.startsWith("0x")) {
+        rawValue = BigInt(rawValue).toString();
+      }
+      const valueWei = BigInt(rawValue);
+      const valueArc = Number(valueWei) / 1e18; // safe now
+
+      // GAS (BigInt)
+      const gasUsed = BigInt(tx.gasUsed || "0");
+      const gasPrice = BigInt(tx.gasPrice || "0");
+      const gasWei = gasUsed * gasPrice;
+      const gasArc = Number(gasWei) / 1e18;
+
+      // TOTAL
+      const totalArc = valueArc + gasArc;
+
+      return {
+        hash: tx.hash,
+        from: tx.from,
+        to: tx.to,
+        value: valueArc.toFixed(6) + " ARC",
+        gas: gasArc.toFixed(6) + " ARC",
+        total: totalArc.toFixed(6) + " ARC",
+        time: new Date(Number(tx.timeStamp) * 1000).toLocaleString(),
+        link: `https://testnet.arcscan.app/tx/${tx.hash}`
+      };
+    });
 
     res.status(200).json({
       address,
-      total: formatted.length,
-      transactions: formatted
+      total: txs.length,
+      transactions: txs
     });
 
   } catch (err) {
-    console.error("ACTIVITY API ERROR:", err);
-    res.status(500).json({ error: "Server error", message: err.toString() });
+    console.error("ACTIVITY ERROR", err);
+    res.status(500).json({ error: "server error" });
   }
 }
