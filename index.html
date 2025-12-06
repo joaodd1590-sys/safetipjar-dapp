@@ -3,96 +3,78 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Arc Activity — Terminal UI</title>
+  <title>ARC ACTIVITY</title>
+  <link rel="icon" type="image/png" href="https://i.imgur.com/0ZK0l9g.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root{
-      --bg:#05030a;
-      --panel:#0b0b10;
-      --neon-cyan:#6cf2c2;
-      --neon-pink:#ff4db8;
-      --muted:#8f98a6;
-      --glass: rgba(255,255,255,0.02);
-      --accent: linear-gradient(90deg,var(--neon-cyan),var(--neon-pink));
+      --bg:#05030a; --neon-cyan:#6cf2c2; --neon-pink:#ff4db8; --muted:#8f98a6; --accent: linear-gradient(90deg,var(--neon-cyan),var(--neon-pink));
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#02020a,var(--bg));font-family:Inconsolata,monospace;color:#e6eef6;-webkit-font-smoothing:antialiased}
-    .wrap{max-width:1200px;margin:32px auto;padding:22px;display:grid;grid-template-columns:1fr 480px;gap:22px}
-    .panel{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:12px;padding:20px;border:1px solid rgba(108,242,194,0.04);
-      box-shadow: 0 20px 60px rgba(2,6,23,0.6);
-      min-height:520px;
-    }
-    .term-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-    .term-title{font-family:Orbitron,monospace;color:var(--neon-cyan);font-size:22px;letter-spacing:0.6px}
+    body{margin:0;background:linear-gradient(180deg,#02020a,var(--bg));font-family:Inconsolata,monospace;color:#e6eef6}
+    .wrap{max-width:1200px;margin:28px auto;padding:22px;display:grid;grid-template-columns:1fr 420px;gap:22px}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:18px;border:1px solid rgba(108,242,194,0.04)}
+    .snapshot-panel{height:fit-content;align-self:flex-start}
+
+    .term-title{font-family:Orbitron;color:var(--neon-cyan);font-size:22px}
     .term-sub{color:var(--muted);font-size:12px}
+    .input-row{display:flex;gap:10px;margin:12px 0}
+    input.address{flex:1;padding:12px;border-radius:8px;border:none;background:rgba(0,0,0,0.35);color:#e6eef6}
+    button.action{min-width:140px;padding:10px;border-radius:8px;border:none;background:var(--accent);cursor:pointer;color:#041017;font-weight:700}
+    .small{font-size:13px;color:var(--muted);margin-top:6px}
 
-    .input-row{display:flex;gap:10px;margin:14px 0}
-    input.address{
-      flex:1;padding:12px 14px;border-radius:8px;border:none;background:rgba(0,0,0,0.35);color:#e6eef6;
-      font-family:Inconsolata;font-size:14px;outline:none;
-      box-shadow: inset 0 -6px 12px rgba(0,0,0,0.5);
-    }
-    button.action{
-      min-width:150px;padding:12px;border-radius:8px;border:none;background:var(--accent);font-weight:700;
-      cursor:pointer;color:#041017;box-shadow:0 8px 30px rgba(108,242,194,0.06);
-    }
-    .small{font-size:13px;color:var(--muted);margin-top:8px}
-
-    .summary{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
-    .stat{
-      background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
-      border-radius:8px;padding:12px 14px;min-width:140px;border:1px solid rgba(255,255,255,0.02);
-      color:#dffbf0;font-size:14px;
-    }
+    .summary{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+    .stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;min-width:120px;border:1px solid rgba(255,255,255,0.03)}
     .stat .label{color:var(--muted);font-size:12px}
-    .stat .num{font-weight:800;color:var(--neon-cyan);font-family:Inconsolata;margin-top:6px}
+    .stat .num{color:var(--neon-cyan);font-weight:700;margin-top:6px}
 
-    .terminal{
-      margin-top:18px;background:linear-gradient(180deg, rgba(0,0,0,0.30), rgba(255,255,255,0.02));
-      border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.03);
-      min-height:300px;overflow:auto;font-family:Inconsolata;color:#cfeef0;font-size:13px;
-      box-shadow: inset 0 0 120px rgba(0,0,0,0.25);
-    }
-    .tx{padding:10px;border-bottom:1px dashed rgba(255,255,255,0.02);
-      display:flex;justify-content:space-between;gap:8px;align-items:center}
-    .tx:last-child{border-bottom:none}
+    .chart-wrap{display:flex;align-items:center;gap:18px;margin-top:14px}
+    .chart-box{width:260px;height:200px;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    .chart-controls{display:flex;gap:8px;align-items:center}
+
+    .terminal{margin-top:14px;background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;min-height:220px;max-height:420px;overflow:auto;border:1px solid rgba(255,255,255,0.03)}
+    .tx{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.02);display:flex;justify-content:space-between;gap:8px;align-items:center}
     .tx .left{flex:1;min-width:0}
-    .tx .hash{color:var(--neon-pink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:460px}
-    .tx .meta{color:var(--muted);font-size:12px;margin-top:6px}
-    .tx .actions{display:flex;gap:8px;align-items:center}
-
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);
-      padding:8px 10px;border-radius:8px;color:var(--muted);
-      cursor:pointer;font-size:13px}
-    .badge-in{background:linear-gradient(90deg,#00ffad,#6cf2c2);
-      color:#041017;padding:6px;border-radius:999px;font-weight:700}
-    .badge-out{background:linear-gradient(90deg,#ff4db8,#ff9bd1);
-      color:#041017;padding:6px;border-radius:999px;font-weight:700}
+    .hash{color:var(--neon-pink);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:500px}
+    .meta{color:var(--muted);font-size:12px;margin-top:6px}
+    .actions{display:flex;gap:8px;align-items:center}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+    .badge-in{background:linear-gradient(90deg,#00ffad,#6cf2c2);color:#041017;padding:6px 8px;border-radius:18px;font-weight:700}
+    .badge-out{background:linear-gradient(90deg,#ff4db8,#ff9bd1);color:#041017;padding:6px 8px;border-radius:18px;font-weight:700}
 
     .side-title{font-family:Orbitron;color:var(--neon-pink);font-size:18px;margin-bottom:8px}
-    .snapshot{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-      padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
-    .snapshot .row{display:flex;justify-content:space-between;padding:8px 0;
-      border-bottom:1px dashed rgba(255,255,255,0.02)}
+    .snapshot{padding:12px;background:rgba(255,255,255,0.01);border-radius:8px;border:1px solid rgba(255,255,255,0.03)}
+    .snapshot .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03)}
     .snapshot .row:last-child{border-bottom:none}
     .copy{margin-top:12px;display:flex;gap:8px}
-    .copy button{flex:1;padding:10px;border-radius:8px;border:none;
-      background:var(--accent);color:#041017;font-weight:700;cursor:pointer}
+    .copy button{flex:1;padding:10px;border-radius:8px;border:none;background:var(--accent);color:#041017;font-weight:700;cursor:pointer}
 
-    @media (max-width:980px){
-      .wrap{grid-template-columns:1fr;padding:18px}
-      .terminal{min-height:240px}
-    }
+    /* leaderboard */
+    .leaderboard{margin-top:14px;background:rgba(0,0,0,0.18);padding:10px;border-radius:8px;max-height:320px;overflow:auto}
+    .lb-row{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .lb-row:last-child{border-bottom:none}
+    .lb-rank{font-weight:800;color:var(--neon-cyan);width:36px}
+    .lb-addr{font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+    .view-btn{padding:6px 8px;border-radius:8px;border:none;background:rgba(255,255,255,0.02);color:var(--neon-pink);cursor:pointer}
+
+    /* toast */
+    .copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--accent);padding:10px 18px;border-radius:10px;font-weight:700;color:#041017;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999}
+    .copy-toast.show{opacity:1;transform:translateX(-50%) translateY(-10px)}
+
+    @media (max-width:980px){ .wrap{grid-template-columns:1fr;padding:16px} .chart-wrap{flex-direction:column;align-items:flex-start} }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
+  <div id="copyToast" class="copy-toast">Copied!</div>
 
-    <div class="panel glow">
-      <div class="term-header">
+  <div class="wrap">
+    <!-- LEFT -->
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <div class="term-title">ARC ACTIVITY TRACKER</div>
           <div class="term-sub">Community scanner — shows live activity on Arc Testnet</div>
@@ -106,159 +88,275 @@
 
       <div class="small">Uses ArcScan API via server backend. No wallet signatures required.</div>
 
-      <div id="summary" class="summary" style="display:none;">
+      <div id="summary" class="summary" style="display:none">
         <div class="stat"><div class="label">Total Transactions</div><div id="tcount" class="num">—</div></div>
         <div class="stat"><div class="label">First Tx</div><div id="first" class="num">—</div></div>
         <div class="stat"><div class="label">Last Tx</div><div id="last" class="num">—</div></div>
         <div class="stat"><div class="label">Status</div><div id="status" class="num">—</div></div>
       </div>
 
-      <div id="terminal" class="terminal">
-        <div style="opacity:0.6">Run a scan to show the latest transactions (Arc Testnet)</div>
+      <div class="chart-wrap">
+        <div class="chart-box">
+          <canvas id="txChart" width="260" height="200"></canvas>
+        </div>
+        <div>
+          <div class="chart-controls">
+            <label style="color:var(--muted);margin-right:6px">Chart:</label>
+            <button id="toggleChart" class="btn-ghost">Donut</button>
+            <label style="margin-left:12px;color:var(--muted)">Filter:</label>
+            <select id="chartFilter" style="background:transparent;border-radius:6px;padding:6px;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">
+              <option value="both">Both</option>
+              <option value="in">IN</option>
+              <option value="out">OUT</option>
+            </select>
+          </div>
+          <div style="color:var(--muted);font-size:13px;margin-top:8px">IN = received · OUT = sent</div>
+        </div>
+      </div>
+
+      <div id="terminal" class="terminal" role="log" aria-live="polite">
+        <div style="opacity:.6">Run a scan to show the latest transactions (Arc Testnet)</div>
       </div>
     </div>
 
-    <div class="panel">
+    <!-- RIGHT -->
+    <div class="panel snapshot-panel">
       <div class="side-title">Wallet Snapshot</div>
 
       <div class="snapshot">
         <div class="row"><div>Wallet</div><div id="snapWallet">—</div></div>
         <div class="row"><div>Network</div><div>Arc Testnet</div></div>
-        <div class="row"><div>Tx Count (last call)</div><div id="snapTx">—</div></div>
+        <div class="row"><div>Tx Count</div><div id="snapTx">—</div></div>
         <div class="row"><div>Active</div><div id="snapActive"><span class="badge-out">No</span></div></div>
 
         <div style="margin-top:12px;color:var(--muted);font-size:13px">Quick actions</div>
-
         <div class="copy">
           <button id="copyLink">Copy Profile Link</button>
           <button id="openExplorer" style="background:#111;border:1px solid rgba(255,255,255,0.04);color:var(--neon-pink)">Open in ArcScan</button>
         </div>
       </div>
+
+      <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700;color:var(--neon-cyan)">Top Active Wallets</div>
+        <button id="refreshLB" class="btn-ghost">Refresh</button>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+        <label style="color:var(--muted)">Show</label>
+        <select id="lbLimit" style="background:transparent;border-radius:6px;padding:6px;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">
+          <option value="10">Top 10</option>
+          <option value="25">Top 25</option>
+          <option value="50" selected>Top 50</option>
+        </select>
+      </div>
+
+      <div id="leaderboard" class="leaderboard"></div>
     </div>
 
   </div>
 
-  <script>
-    const terminal = document.getElementById('terminal');
-    const summary = document.getElementById('summary');
-    const tcount = document.getElementById('tcount');
-    const first = document.getElementById('first');
-    const last = document.getElementById('last');
-    const status = document.getElementById('status');
-    const snapWallet = document.getElementById('snapWallet');
-    const snapTx = document.getElementById('snapTx');
-    const snapActive = document.getElementById('snapActive');
-    const copyLink = document.getElementById('copyLink');
-    const openExplorer = document.getElementById('openExplorer');
-    const addrInput = document.getElementById('addr');
-    const checkBtn = document.getElementById('check');
+<script>
+  // helpers
+  const $ = sel => document.querySelector(sel);
+  const terminal = $("#terminal");
+  const addrInput = $("#addr");
+  const checkBtn = $("#check");
+  const summary = $("#summary");
+  const tcount = $("#tcount");
+  const first = $("#first");
+  const last = $("#last");
+  const status = $("#status");
+  const snapWallet = $("#snapWallet");
+  const snapTx = $("#snapTx");
+  const snapActive = $("#snapActive");
+  const copyLink = $("#copyLink");
+  const openExplorer = $("#openExplorer");
+  const txChartEl = document.getElementById("txChart");
+  const toggleChartBtn = $("#toggleChart");
+  const chartFilter = $("#chartFilter");
+  const leaderboardEl = $("#leaderboard");
+  const refreshLB = $("#refreshLB");
+  const lbLimit = $("#lbLimit");
+  const copyToast = $("#copyToast");
 
-    function clearTerminal(){
-      terminal.innerHTML = '';
-    }
+  function showToast(text="Copied!") {
+    copyToast.textContent = text;
+    copyToast.classList.add("show");
+    setTimeout(()=> copyToast.classList.remove("show"),1400);
+  }
 
-    function appendLine(html){
-      const div = document.createElement('div');
-      div.className = 'tx';
-      div.innerHTML = html;
-      terminal.prepend(div);
-    }
+  function clearTerminal(){ terminal.innerHTML = ""; }
+  function appendLine(html){ const d=document.createElement("div"); d.className="tx"; d.innerHTML=html; terminal.prepend(d); }
 
-    function setLoading(){
-      clearTerminal();
-      terminal.innerHTML = '<div style="text-align:center;padding:18px"><div style="display:inline-block;width:48px;height:48px;border-radius:50%;background:conic-gradient(from 0deg, rgba(108,242,194,0.95), rgba(108,242,194,0.25) 50%, transparent 60%);animation:spin 1s linear infinite"></div><div style="margin-top:8px;color:var(--muted)">Scanning Arc Testnet...</div></div>';
-    }
+  // Chart setup
+  let chartType = "doughnut";
+  let txChart = new Chart(txChartEl.getContext("2d"), {
+    type: chartType,
+    data: { labels:["IN","OUT"], datasets:[{data:[0,0], backgroundColor:["#6cf2c2","#ff4db8"]}] },
+    options: { responsive:true, plugins:{legend:{position:"bottom"}}}
+  });
 
-    async function runScan(){
-      const wallet = addrInput.value.trim();
-      if(!wallet.startsWith("0x") || wallet.length < 40){
-        alert("Paste a valid Arc Testnet wallet (0x...)");
-        return;
-      }
+  function updateChart(inCount, outCount) {
+    const filter = chartFilter.value;
+    let a = inCount, b = outCount;
+    if (filter === "in") b = 0;
+    if (filter === "out") a = 0;
+    txChart.data.datasets[0].data = [a, b];
+    txChart.update();
+    toggleChartBtn.textContent = chartType === "doughnut" ? "Donut" : "Bar";
+  }
 
-      setLoading();
-      summary.style.display = 'none';
-
-      snapWallet.textContent = wallet;
-      openExplorer.onclick = ()=> window.open(`https://testnet.arcscan.app/address/${wallet}`, "_blank");
-      copyLink.onclick = ()=> navigator.clipboard.writeText(`${location.origin}/?addr=${wallet}`);
-
-      try{
-        const resp = await fetch(`/api/activity?address=${encodeURIComponent(wallet)}`);
-        if(!resp.ok){
-          terminal.textContent = `Server error: ${resp.status}`;
-          return;
-        }
-
-        const data = await resp.json();
-        const txs = data.transactions || [];
-        const total = txs.length;
-
-        // summary
-        tcount.textContent = total;
-        const firstTx = txs.length ? txs[txs.length-1].time : null;
-        const lastTx = txs.length ? txs[0].time : null;
-
-        first.textContent = firstTx || '—';
-        last.textContent = lastTx || '—';
-        status.textContent = total > 0 ? 'ACTIVE' : 'NO ACTIVITY';
-        status.style.color = total > 0 ? '#00ff9c' : '#ff6b6b';
-        summary.style.display = 'flex';
-
-        // snapshot
-        snapTx.textContent = total;
-        snapActive.innerHTML = total > 0 ? '<span class="badge-in">Yes</span>' : '<span class="badge-out">No</span>';
-
-        // terminal
-        clearTerminal();
-
-        if(txs.length === 0){
-          terminal.innerHTML = '<div style="padding:12px;color:var(--muted)">No transactions found.</div>';
-          return;
-        }
-
-        for(const tx of txs){
-          const value = (Number(tx.value) === 0) ? '0' : (Number(tx.value)/1e18).toFixed(4);
-          const direction = tx.from.toLowerCase() === wallet.toLowerCase() ? 'OUT' : 'IN';
-          const badge = direction === 'IN'
-            ? '<span class="badge-in">IN</span>'
-            : '<span class="badge-out">OUT</span>';
-
-          appendLine(`
-            <div class="left">
-              <div class="hash">${tx.hash}</div>
-              <div class="meta">${tx.from} → ${tx.to} • ${value} • ${tx.time}</div>
-            </div>
-            <div class="actions">
-              ${badge}
-              <button class="btn-ghost" onclick="navigator.clipboard.writeText('${tx.hash}')">Copy</button>
-              <button class="btn-ghost" onclick="window.open('${tx.link}', '_blank')">Explorer</button>
-            </div>
-          `);
-        }
-
-      }catch(err){
-        clearTerminal();
-        terminal.textContent = 'Network error. Try again.';
-      }
-    }
-
-    checkBtn.onclick = runScan;
-
-    addrInput.addEventListener("keydown", e=>{
-      if(e.key === "Enter") runScan();
+  toggleChartBtn.onclick = () => {
+    const ctx = txChartEl.getContext("2d");
+    chartType = chartType === "doughnut" ? "bar" : "doughnut";
+    txChart.destroy();
+    txChart = new Chart(ctx, {
+      type: chartType,
+      data: { labels:["IN","OUT"], datasets:[{data:[0,0], backgroundColor:["#6cf2c2","#ff4db8"]}] },
+      options: { responsive:true, plugins:{legend:{position:"bottom"}} }
     });
+    updateChart(currentInCount, currentOutCount);
+  };
 
-    // Auto-load only if ?addr=0x...
-    (function autoLoad(){
-      const params = new URLSearchParams(location.search);
-      const a = params.get('addr');
+  chartFilter.onchange = () => updateChart(currentInCount, currentOutCount);
 
-      if(a && a.startsWith("0x") && a.length > 40){
-        addrInput.value = a;
-        runScan();
+  // globals for chart
+  let currentInCount = 0;
+  let currentOutCount = 0;
+
+  // runScan -> calls /api/activity?address=
+  async function runScan() {
+    const wallet = addrInput.value.trim();
+    if(!wallet.startsWith("0x") || wallet.length < 40){ alert("Paste a valid Arc Testnet wallet (0x...)"); return; }
+
+    clearTerminal();
+    terminal.innerHTML = `<div style="padding:12px;color:var(--muted)">Scanning...</div>`;
+    summary.style.display = "none";
+    snapWallet.textContent = wallet;
+
+    try {
+      const resp = await fetch(`/api/activity?address=${encodeURIComponent(wallet)}`);
+      if(!resp.ok){ terminal.innerHTML = `<div style="padding:12px;color:var(--muted)">Server error ${resp.status}</div>`; return; }
+      const data = await resp.json();
+      const txs = data.transactions || [];
+      const total = txs.length;
+
+      // counts IN / OUT
+      currentInCount = txs.filter(tx => tx.to && tx.to.toLowerCase() === wallet.toLowerCase()).length;
+      currentOutCount = txs.filter(tx => tx.from && tx.from.toLowerCase() === wallet.toLowerCase()).length;
+      updateChart(currentInCount, currentOutCount);
+
+      tcount.textContent = total;
+      snapTx.textContent = total;
+      first.textContent = txs.length ? txs[txs.length-1].time : "—";
+      last.textContent = txs.length ? txs[0].time : "—";
+
+      if(total>0){
+        status.textContent = "ACTIVE"; status.style.color="#00ff9c"; snapActive.innerHTML='<span class="badge-in">Yes</span>';
+      } else {
+        status.textContent = "NO ACTIVITY"; status.style.color="#ff6b6b"; snapActive.innerHTML='<span class="badge-out">No</span>';
       }
-    })();
-  </script>
+      summary.style.display = "flex";
+
+      // render transactions (newest first)
+      clearTerminal();
+      if(!txs.length){ terminal.innerHTML = `<div style="padding:10px;color:var(--muted)">No transactions found.</div>`; return; }
+      for(const tx of txs){
+        const value = Number(tx.value)/1e18 || 0;
+        const direction = tx.from.toLowerCase() === wallet.toLowerCase() ? "OUT" : "IN";
+        const badge = direction==="IN" ? `<span class="badge-in">IN</span>` : `<span class="badge-out">OUT</span>`;
+        const html = `
+          <div class="left">
+            <div class="hash">${tx.hash}</div>
+            <div class="meta">${tx.from} → ${tx.to} • ${value.toFixed(4)} • ${tx.time}</div>
+          </div>
+          <div class="actions">
+            ${badge}
+            <button class="btn-ghost" onclick="navigator.clipboard.writeText('${tx.hash}').then(()=>showCopy())">Copy</button>
+            <button class="btn-ghost" onclick="window.open('${tx.link}','_blank')">Explorer</button>
+          </div>
+        `;
+        appendLine(html);
+      }
+    } catch(err){
+      console.error(err);
+      terminal.innerHTML = `<div style="padding:10px;color:var(--muted)">Network error.</div>`;
+    }
+  }
+
+  // small wrapper to show copy toast
+  function showCopy(){ showToast("Copied!"); }
+
+  // Leaderboard fetch + render
+  async function fetchLeaderboard(limit=50) {
+    leaderboardEl.innerHTML = `<div style="padding:8px;color:var(--muted)">Loading leaderboard (scanning recent blocks)...</div>`;
+    try {
+      const resp = await fetch(`/api/leaderboard`);
+      if(!resp.ok){ leaderboardEl.innerHTML = `<div style="padding:8px;color:var(--muted)">Leaderboard error ${resp.status}</div>`; return; }
+      const data = await resp.json();
+      const top = (data.top || []).slice(0, Number(limit));
+      if(!top.length){ leaderboardEl.innerHTML = `<div style="padding:8px;color:var(--muted)">No leaderboard data yet.</div>`; return; }
+
+      const frag = document.createDocumentFragment();
+      top.forEach((row, idx) => {
+        const div = document.createElement("div");
+        div.className = "lb-row";
+        div.innerHTML = `
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="lb-rank">${idx+1}</div>
+            <div>
+              <div class="lb-addr">${row.address}</div>
+              <div style="color:var(--muted);font-size:12px">txs: ${row.count} · last: ${row.lastInteraction||'—'}</div>
+            </div>
+          </div>
+          <div>
+            <button class="view-btn" data-addr="${row.address}">View</button>
+          </div>
+        `;
+        frag.appendChild(div);
+      });
+      leaderboardEl.innerHTML = "";
+      leaderboardEl.appendChild(frag);
+
+      // attach click handlers for view
+      [...leaderboardEl.querySelectorAll(".view-btn")].forEach(b => {
+        b.onclick = (e) => {
+          const a = e.currentTarget.dataset.addr;
+          window.location.href = `${location.origin}/?addr=${a}`;
+        };
+      });
+
+    } catch(err){
+      console.error(err);
+      leaderboardEl.innerHTML = `<div style="padding:8px;color:var(--muted)">Leaderboards fetch error.</div>`;
+    }
+  }
+
+  // utility: show toast
+  function showToast(txt="Copied!"){
+    copyToast.textContent = txt;
+    copyToast.classList.add("show");
+    setTimeout(()=>copyToast.classList.remove("show"),1400);
+  }
+
+  // events
+  document.getElementById("check").onclick = runScan;
+  addrInput.onkeydown = e => { if(e.key==="Enter") runScan(); };
+  copyLink.onclick = () => { const w = addrInput.value.trim(); if(!w) return; navigator.clipboard.writeText(`${location.origin}/?addr=${w}`); showToast("Profile link copied"); };
+  refreshLB.onclick = () => fetchLeaderboard(lbLimit.value);
+  lbLimit.onchange = () => fetchLeaderboard(lbLimit.value);
+
+  // autoload if ?addr=...
+  ( ()=>{
+    const a = new URLSearchParams(location.search).get("addr");
+    if(a && a.startsWith("0x") && a.length>40){
+      addrInput.value = a;
+      runScan();
+    }
+    // initial load leaderboard
+    fetchLeaderboard(lbLimit.value);
+  })();
+
+</script>
 </body>
 </html>
