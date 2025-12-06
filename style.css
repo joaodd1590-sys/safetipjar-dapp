@@ -1,4 +1,3 @@
-/* GLOBAL */
 :root {
   --bg: #02020a;
   --neon-cyan: #6cf2c2;
@@ -12,40 +11,9 @@ body {
   background: #02020a;
   font-family: Inconsolata, monospace;
   color: #e6eef6;
-  overflow-x: hidden;
 }
 
-/* CYBERPUNK GLOW */
-#cyberGlow {
-  position: fixed;
-  width: 140px;
-  height: 140px;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-
-  background: radial-gradient(circle,
-    rgba(108, 242, 194, 0.20) 0%,
-    rgba(255, 77, 184, 0.18) 40%,
-    rgba(0,0,0,0) 75%
-  );
-
-  border-radius: 50%;
-  mix-blend-mode: screen;
-  filter: blur(30px);
-  opacity: 0.55;
-  transform: translate(-70px, -70px);
-  transition: opacity 0.18s ease-out;
-  z-index: 0;
-}
-
-/* Glow some quando mouse sobre painel */
-.panel:hover ~ #cyberGlow,
-.panel:hover + #cyberGlow {
-  opacity: 0;
-}
-
-/* GRID LAYOUT */
+/* GRID */
 .wrap {
   max-width: 1200px;
   margin: 28px auto;
@@ -53,8 +21,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 420px;
   gap: 22px;
-  position: relative;
-  z-index: 2;
 }
 
 .panel {
@@ -62,18 +28,14 @@ body {
   border-radius: 12px;
   padding: 18px;
   border: 1px solid rgba(108, 242, 194, 0.04);
-  position: relative;
-  z-index: 3;
 }
 
-/* TITLES */
 .term-title {
   font-family: Orbitron;
   color: var(--neon-cyan);
   font-size: 22px;
 }
 
-/* INPUT */
 .input-row {
   display: flex;
   gap: 10px;
@@ -96,12 +58,24 @@ button.action {
   border: none;
   background: var(--accent);
   color: #041017;
-  font-weight: 700;
   cursor: pointer;
-  font-size: 15px;
+  font-weight: 700;
 }
 
-/* TERMINAL */
+.summary {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 150px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
 .terminal {
   margin-top: 16px;
   background: rgba(255, 255, 255, 0.02);
@@ -110,10 +84,8 @@ button.action {
   min-height: 260px;
   max-height: 480px;
   overflow: auto;
-  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* TX ROW */
 .tx {
   padding: 10px 4px;
   border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
@@ -160,14 +132,34 @@ button.action {
   background: linear-gradient(90deg, #ff4db8, #ff9bd1);
 }
 
-/* SNAPSHOT */
 .side-title {
   font-family: Orbitron;
   font-size: 18px;
   color: var(--neon-pink);
 }
 
-/* RESPONSIVE */
+.snapshot {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.lb-coming {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 @media (max-width: 980px) {
   .wrap {
     grid-template-columns: 1fr;
