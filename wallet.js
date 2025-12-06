@@ -28,7 +28,7 @@ function shortAddr(addr) {
   return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
-// Renderiza UMA transação no terminal
+// Renderiza UMA transação
 function appendTx(tx, wallet) {
   const row = document.createElement("div");
   row.className = "tx";
@@ -40,7 +40,6 @@ function appendTx(tx, wallet) {
   let direction = "";
   if (fromLower === wLower) direction = "OUT";
   else if (toLower === wLower) direction = "IN";
-  else direction = "-";
 
   const badge =
     direction === "IN"
@@ -52,7 +51,6 @@ function appendTx(tx, wallet) {
   const fromText = tx.from || "--";
   const toText   = tx.to   || "--";
 
-  // Aqui usamos o TOTAL calculado pelo backend
   const totalText = tx.total || tx.value || "0 USDC";
 
   row.innerHTML = `
@@ -74,7 +72,7 @@ function appendTx(tx, wallet) {
   terminal.prepend(row);
 }
 
-// Função principal: faz o scan
+// Função principal
 async function runScan() {
   const wallet = addrInput.value.trim();
 
@@ -86,7 +84,6 @@ async function runScan() {
   terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Scanning Arc Testnet...</div>`;
   summary.style.display = "none";
 
-  // Atualiza snapshot com o endereço
   snapWalletEl.textContent = shortAddr(wallet);
   snapTxEl.textContent = "0";
   snapActiveEl.innerHTML = `<span class="badge-out">No</span>`;
@@ -102,7 +99,6 @@ async function runScan() {
     const txs = data.transactions || [];
     const total = txs.length;
 
-    // Atualiza resumo
     tcountEl.textContent = total.toString();
     snapTxEl.textContent = total.toString();
 
@@ -128,7 +124,7 @@ async function runScan() {
     clearTerminal();
 
     if (!txs.length) {
-      terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">No transactions found for this wallet.</div>`;
+      terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">No transactions found.</div>`;
       return;
     }
 
@@ -136,50 +132,37 @@ async function runScan() {
 
   } catch (err) {
     console.error("SCAN ERROR:", err);
-    terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Network error while contacting backend.</div>`;
+    terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Network error contacting backend.</div>`;
   }
 }
 
-// Copy Profile Link
+// Botões
 copyLinkBtn?.addEventListener("click", () => {
   const wallet = addrInput.value.trim();
   if (!wallet) return;
-  const url = `${location.origin}/?addr=${encodeURIComponent(wallet)}`;
-  navigator.clipboard.writeText(url);
+  navigator.clipboard.writeText(`${location.origin}/?addr=${wallet}`);
   alert("Profile link copied");
 });
 
-// Open in ArcScan
 openExpBtn?.addEventListener("click", () => {
   const wallet = addrInput.value.trim();
   if (!wallet) return;
   window.open(`https://testnet.arcscan.app/address/${wallet}`, "_blank");
 });
 
-// Botão Run Scan
 checkBtn.addEventListener("click", runScan);
+addrInput.addEventListener("keydown", e => { if (e.key === "Enter") runScan(); });
 
-// Enter no input também dispara
-addrInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") runScan();
-});
-
-// Se vier ?addr= na URL, já carrega
 (function autoloadFromQuery() {
-  const params = new URLSearchParams(location.search);
-  const a = params.get("addr");
+  const a = new URLSearchParams(location.search).get("addr");
   if (a && a.startsWith("0x") && a.length > 40) {
     addrInput.value = a;
     runScan();
   }
 })();
 
-// ======================================
-// CYBERPUNK GLOW FOLLOWING MOUSE
-// ======================================
-
+// CYBERPUNK GLOW
 const glow = document.getElementById("cyberGlow");
-
 document.addEventListener("mousemove", (e) => {
   glow.style.left = `${e.clientX}px`;
   glow.style.top = `${e.clientY}px`;
