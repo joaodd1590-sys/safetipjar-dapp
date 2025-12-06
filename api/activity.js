@@ -15,21 +15,33 @@ export default async function handler(req, res) {
     }
 
     const txs = json.result.map(tx => {
-      let raw = tx.value || "0";
+      // ----------------------------
+      // VALUE enviado
+      // ----------------------------
+      let rawValue = tx.value || "0";
+      if (rawValue.startsWith("0x")) rawValue = parseInt(rawValue, 16);
+      const valueArc = Number(rawValue) / 1e18;
 
-      // converter hex → número
-      if (typeof raw === "string" && raw.startsWith("0x")) {
-        raw = parseInt(raw, 16);
-      }
+      // ----------------------------
+      // GAS gasto
+      // ----------------------------
+      const gasUsed = Number(tx.gasUsed || 0);
+      const gasPrice = Number(tx.gasPrice || 0);
+      const gasSpentWei = gasUsed * gasPrice;
+      const gasSpentArc = gasSpentWei / 1e18;
 
-      // USDC = 6 decimais
-      const usdcValue = Number(raw) / 1e6;
+      // ----------------------------
+      // TOTAL gasto
+      // ----------------------------
+      const totalCost = valueArc + gasSpentArc;
 
       return {
         hash: tx.hash,
         from: tx.from,
         to: tx.to,
-        value: usdcValue.toFixed(4), // AGORA USDC ESTÁ CERTO
+        value: valueArc.toFixed(6) + " ARC",
+        gas: gasSpentArc.toFixed(6) + " ARC",
+        total: totalCost.toFixed(6) + " ARC",
         time: new Date(Number(tx.timeStamp) * 1000).toLocaleString(),
         link: `https://testnet.arcscan.app/tx/${tx.hash}`,
         timeStamp: Number(tx.timeStamp)
