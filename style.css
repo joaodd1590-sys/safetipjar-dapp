@@ -1,306 +1,205 @@
-/* ===========================================
-   GLOBAL THEME
-=========================================== */
 :root {
   --bg: #05030a;
-  --neon-cyan: #6cf2c2;
-  --neon-pink: #ff4db8;
-  --muted: #8f98a6;
-  --accent: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-}
+  --panel: #0a0a12;
+  --panel2: #0f0f1a;
+  --txt: #e6eef6;
+  --muted: #9aa0b3;
 
-* {
-  box-sizing: border-box;
+  --neon-cyan: #2affff;
+  --neon-pink: #ff3ac9;
+  --neon-purple: #b36bff;
+  --neon-yellow: #ffe680;
+
+  --radius: 10px;
 }
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #02020a, var(--bg));
+  background: #05030a; /* FUNDO SÓLIDO */
   font-family: Inconsolata, monospace;
-  color: #e6eef6;
+  color: var(--txt);
 }
 
-/* ===========================================
-   MAIN GRID WRAPPER
-=========================================== */
-.wrap {
-  max-width: 1200px;
-  margin: 28px auto;
-  padding: 22px;
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 22px;
-}
-
-/* ===========================================
-   PANELS
-=========================================== */
-.panel {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
-  border-radius: 12px;
-  padding: 18px;
-  border: 1px solid rgba(108, 242, 194, 0.04);
-}
-
-.snapshot-panel {
-  height: fit-content;
-  align-self: flex-start;
-}
-
-/* ===========================================
-   TITLES
-=========================================== */
-.term-title {
-  font-family: Orbitron;
-  color: var(--neon-cyan);
-  font-size: 22px;
-}
-
-.term-sub {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-/* ===========================================
-   INPUT + BUTTON
-=========================================== */
-.input-row {
+/* ==============================
+   Layout
+============================== */
+.main {
   display: flex;
-  gap: 10px;
-  margin: 14px 0 18px 0;
+  padding: 40px;
+  gap: 30px;
+  justify-content: center;
 }
 
-input.address {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(0, 0, 0, 0.35);
-  color: #e6eef6;
+/* Panel Left */
+.left {
+  width: 850px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 25px;
+  box-shadow: 0 0 25px #0007 inset;
 }
 
-button.action {
-  min-width: 160px;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: var(--accent);
-  color: #041017;
-  font-weight: 700;
-  cursor: pointer;
+/* Panel Right */
+.right {
+  width: 420px;
+  background: var(--panel2);
+  border-radius: var(--radius);
+  padding: 25px;
+  box-shadow: 0 0 25px #0005 inset;
+}
+
+/* Title */
+h1 {
+  margin: 0;
+  font-size: 28px;
+  color: var(--neon-cyan);
+}
+
+h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: var(--neon-pink);
+}
+
+/* ==============================
+   Input + Button
+============================== */
+input {
+  width: 70%;
+  padding: 12px 14px;
+  background: #11131c;
+  border: 1px solid #242635;
+  color: var(--txt);
+  border-radius: var(--radius);
   font-size: 15px;
 }
 
-/* ===========================================
-   SUMMARY BOXES
-=========================================== */
-.summary {
-  display: flex;
-  gap: 12px;
-  margin-top: 12px;
-  flex-wrap: wrap;
+button.action {
+  padding: 12px 25px;
+  font-size: 16px;
+  margin-left: 10px;
+  background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  cursor: pointer;
+  transition: 0.25s ease;
 }
 
-.stat {
-  background: rgba(255, 255, 255, 0.02);
-  padding: 12px;
-  border-radius: 8px;
-  min-width: 150px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-.stat .label {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.stat .num {
-  color: var(--neon-cyan);
-  font-weight: 700;
-  margin-top: 6px;
-}
-
-/* ===========================================
-   TRANSACTION TERMINAL
-=========================================== */
+/* ==============================
+   Terminal
+============================== */
 .terminal {
-  margin-top: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 10px;
-  padding: 12px;
-  min-height: 260px;
-  max-height: 480px;
-  overflow: auto;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: #0d0f16;
+  border-radius: var(--radius);
+  padding: 20px;
+  height: 380px;
+  margin-top: 20px;
+  overflow-y: auto;
+  font-size: 14px;
+  box-shadow: 0 0 12px #0006 inset;
 }
 
-/* Scroll bonito */
-.terminal::-webkit-scrollbar {
-  width: 8px;
-}
-.terminal::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
-/* ===========================================
-   TRANSACTION ROWS
-=========================================== */
 .tx {
-  padding: 10px 4px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #1a1a25;
 }
 
-.tx .left {
-  flex: 1;
-  min-width: 0;
+.tx .hash {
+  font-weight: bold;
+  color: var(--neon-cyan);
+  margin-bottom: 5px;
 }
 
-.hash {
-  color: var(--neon-pink);
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 550px;
-}
-
-.meta {
+.tx .meta {
+  font-size: 13px;
   color: var(--muted);
-  font-size: 12px;
-  margin-top: 6px;
 }
 
 .actions {
+  margin-top: 6px;
   display: flex;
   gap: 8px;
-  align-items: center;
 }
 
-/* ===========================================
-   BADGES IN / OUT — (Centralized Perfectly)
-=========================================== */
-.badge-in,
-.badge-out {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 50px;
-  height: 30px;
-
-  padding: 0 12px;
-  border-radius: 18px;
-
-  font-weight: 700;
-  font-size: 12px;
-  color: #041017;
-
-  white-space: nowrap;
-}
-
-.badge-in {
-  background: linear-gradient(90deg, #00ffad, #6cf2c2);
-}
-
-.badge-out {
-  background: linear-gradient(90deg, #ff4db8, #ff9bd1);
-}
-
-/* ===========================================
-   SIMPLE BUTTONS
-=========================================== */
 .btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: var(--muted);
+  background: #1b1b24;
+  border: 1px solid #333;
+  padding: 5px 10px;
+  font-size: 13px;
+  color: var(--txt);
+  border-radius: var(--radius);
   cursor: pointer;
+  transition: 0.25s ease;
 }
 
-/* ===========================================
-   SNAPSHOT
-=========================================== */
-.side-title {
-  font-family: Orbitron;
-  color: var(--neon-pink);
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
+/* ==============================
+   Snapshot
+============================== */
 .snapshot {
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 10px;
+  font-size: 15px;
 }
 
-.snapshot .row {
+.snapshot-row {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #222430;
 }
 
-.snapshot .row:last-child {
-  border-bottom: none;
+.badge-in {
+  background: var(--neon-cyan);
+  padding: 4px 10px;
+  color: black;
+  font-weight: bold;
+  border-radius: 20px;
 }
 
-.copy {
-  margin-top: 14px;
-  display: flex;
-  gap: 8px;
+.badge-out {
+  background: var(--neon-pink);
+  padding: 4px 10px;
+  color: black;
+  font-weight: bold;
+  border-radius: 20px;
 }
 
-.copy button {
-  flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: var(--accent);
-  color: #041017;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* ===========================================
-   LEADERBOARD — COMING SOON
-=========================================== */
-.lb-coming {
-  margin-top: 18px;
-  padding: 16px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.lb-coming-title {
-  font-family: Orbitron;
-  font-size: 17px;
-  color: var(--neon-cyan);
-}
-
-.lb-coming-sub {
+/* ==============================
+   Leaderboard Panel
+============================== */
+.leaderboard {
+  margin-top: 20px;
+  padding: 15px;
+  background: #0d0d17;
+  border-radius: var(--radius);
+  font-size: 15px;
   color: var(--muted);
-  font-size: 13px;
-  margin-top: 6px;
-  line-height: 1.4;
 }
 
-/* ===========================================
-   RESPONSIVE
-=========================================== */
-@media (max-width: 980px) {
-  .wrap {
-    grid-template-columns: 1fr;
-  }
+/* ======================================================
+   🔥 BUTTON ANIMATIONS — NEON HOVER + CLICK
+====================================================== */
+button.action,
+.copy button,
+.btn-ghost {
+  transition: 0.25s ease;
 }
+
+/* Hover */
+button.action:hover,
+.copy button:hover,
+.btn-ghost:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 12px var(--neon-cyan);
+  opacity: 0.95;
+}
+
+/* Click */
+button.action:active,
+.copy button:active,
+.btn-ghost:active {
+  transform: scale(0.92);
+  box-shadow: 0 0 18px var(--neon-pink);
+  transition: 0.12s;
+}
+
