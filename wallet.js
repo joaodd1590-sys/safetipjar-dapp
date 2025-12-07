@@ -2,7 +2,6 @@
 // ARC ACTIVITY TRACKER - FRONTEND
 // ===============================
 
-// Pega elementos do DOM
 const addrInput     = document.getElementById("addr");
 const checkBtn      = document.getElementById("check");
 const terminal      = document.getElementById("terminal");
@@ -17,18 +16,15 @@ const snapActiveEl  = document.getElementById("snapActive");
 const copyLinkBtn   = document.getElementById("copyLink");
 const openExpBtn    = document.getElementById("openExplorer");
 
-// Helper: limpa terminal
 function clearTerminal() {
   terminal.innerHTML = "";
 }
 
-// Helper: encurta endereço
 function shortAddr(addr) {
   if (!addr || addr.length < 10) return addr || "--";
   return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
-// Renderiza UMA transação
 function appendTx(tx, wallet) {
   const row = document.createElement("div");
   row.className = "tx";
@@ -42,16 +38,22 @@ function appendTx(tx, wallet) {
   else if (toLower === wLower) direction = "IN";
 
   const badge =
-    direction === "IN"  ? `<span class="badge-in">IN</span>` :
-    direction === "OUT" ? `<span class="badge-out">OUT</span>` : "";
+    direction === "IN"
+      ? `<span class="badge-in">IN</span>`
+      : direction === "OUT"
+      ? `<span class="badge-out">OUT</span>`
+      : "";
 
-  const totalText = tx.total || tx.value || "0 USDC";
+  const fromText = tx.from || "--";
+  const toText   = tx.to   || "--";
+
+  const totalText = tx.total || tx.value || "0 ARC";
 
   row.innerHTML = `
     <div class="left">
       <div class="hash">${tx.hash}</div>
       <div class="meta">
-        ${tx.from} → ${tx.to}
+        ${fromText} → ${toText}
         • Total: ${totalText}
         • ${tx.time}
       </div>
@@ -66,7 +68,6 @@ function appendTx(tx, wallet) {
   terminal.prepend(row);
 }
 
-// Função principal
 async function runScan() {
   const wallet = addrInput.value.trim();
 
@@ -84,56 +85,74 @@ async function runScan() {
 
   try {
     const resp = await fetch(`/api/activity?address=${encodeURIComponent(wallet)}`);
-    const data = await resp.json();
+    if (!resp.ok) {
+      terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Server error ${resp.status}</div>`;
+      return;
+    }
 
+    const data = await resp.json();
     const txs = data.transactions || [];
     const total = txs.length;
 
-    tcountEl.textContent = total;
-    snapTxEl.textContent = total;
+    tcountEl.textContent = total.toString();
+    snapTxEl.textContent = total.toString();
 
     if (total > 0) {
       const newest = txs[0];
       const oldest = txs[txs.length - 1];
 
-      firstEl.textContent  = oldest.time;
-      lastEl.textContent   = newest.time;
+      firstEl.textContent  = oldest.time || "--";
+      lastEl.textContent   = newest.time || "--";
       statusEl.textContent = "ACTIVE";
       statusEl.style.color = "#00ff9c";
       snapActiveEl.innerHTML = `<span class="badge-in">Yes</span>`;
     } else {
-      firstEl.textContent = "--";
-      lastEl.textContent  = "--";
+      firstEl.textContent  = "--";
+      lastEl.textContent   = "--";
       statusEl.textContent = "NO ACTIVITY";
       statusEl.style.color = "#ff6b6b";
+      snapActiveEl.innerHTML = `<span class="badge-out">No</span>`;
     }
 
     summary.style.display = "flex";
 
     clearTerminal();
+
+    if (!txs.length) {
+      terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">No transactions found for this wallet.</div>`;
+      return;
+    }
+
     txs.forEach(tx => appendTx(tx, wallet));
 
   } catch (err) {
-    terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Network error contacting backend.</div>`;
+    terminal.innerHTML = `<div style="padding:10px; color:var(--muted);">Network error while contacting backend.</div>`;
   }
 }
 
 copyLinkBtn?.addEventListener("click", () => {
   const wallet = addrInput.value.trim();
-  navigator.clipboard.writeText(`${location.origin}/?addr=${wallet}`);
+  if (!wallet) return;
+  const url = `${location.origin}/?addr=${encodeURIComponent(wallet)}`;
+  navigator.clipboard.writeText(url);
   alert("Profile link copied");
 });
 
 openExpBtn?.addEventListener("click", () => {
   const wallet = addrInput.value.trim();
+  if (!wallet) return;
   window.open(`https://testnet.arcscan.app/address/${wallet}`, "_blank");
 });
 
 checkBtn.addEventListener("click", runScan);
-addrInput.addEventListener("keydown", e => { if (e.key === "Enter") runScan(); });
+
+addrInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") runScan();
+});
 
 (function autoloadFromQuery() {
-  const a = new URLSearchParams(location.search).get("addr");
+  const params = new URLSearchParams(location.search);
+  const a = params.get("addr");
   if (a && a.startsWith("0x") && a.length > 40) {
     addrInput.value = a;
     runScan();
