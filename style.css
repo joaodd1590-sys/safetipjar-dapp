@@ -1,205 +1,138 @@
 :root {
-  --bg: #05030a;
-  --panel: #0a0a12;
-  --panel2: #0f0f1a;
-  --txt: #e6eef6;
-  --muted: #9aa0b3;
-
-  --neon-cyan: #2affff;
-  --neon-pink: #ff3ac9;
-  --neon-purple: #b36bff;
-  --neon-yellow: #ffe680;
-
-  --radius: 10px;
+    --bg: #0d0f16;
+    --panel: #161922;
+    --accent: #ff4ad8;
+    --accent2: #4affd6;
+    --text: #e8e8e8;
+    --muted: #9b9b9b;
 }
 
 body {
-  margin: 0;
-  background: #05030a; /* FUNDO SÓLIDO */
-  font-family: Inconsolata, monospace;
-  color: var(--txt);
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inconsolata", monospace;
 }
 
-/* ==============================
-   Layout
-============================== */
-.main {
-  display: flex;
-  padding: 40px;
-  gap: 30px;
-  justify-content: center;
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px;
+    gap: 40px;
 }
 
-/* Panel Left */
 .left {
-  width: 850px;
-  background: var(--panel);
-  border-radius: var(--radius);
-  padding: 25px;
-  box-shadow: 0 0 25px #0007 inset;
+    width: 60%;
 }
 
-/* Panel Right */
 .right {
-  width: 420px;
-  background: var(--panel2);
-  border-radius: var(--radius);
-  padding: 25px;
-  box-shadow: 0 0 25px #0005 inset;
+    width: 35%;
 }
 
-/* Title */
-h1 {
-  margin: 0;
-  font-size: 28px;
-  color: var(--neon-cyan);
+.title {
+    font-family: "Orbitron", sans-serif;
+    color: var(--accent2);
 }
 
-h2 {
-  margin: 0 0 10px;
-  font-size: 22px;
-  color: var(--neon-pink);
+.subtitle {
+    margin-top: -10px;
+    color: var(--muted);
 }
 
-/* ==============================
-   Input + Button
-============================== */
+.input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
 input {
-  width: 70%;
-  padding: 12px 14px;
-  background: #11131c;
-  border: 1px solid #242635;
-  color: var(--txt);
-  border-radius: var(--radius);
-  font-size: 15px;
+    flex: 1;
+    padding: 12px;
+    border-radius: 6px;
+    border: none;
+    background: var(--panel);
+    color: var(--text);
+    font-size: 14px;
 }
 
-button.action {
-  padding: 12px 25px;
-  font-size: 16px;
-  margin-left: 10px;
-  background: linear-gradient(90deg, var(--neon-purple), var(--neon-pink));
-  border: none;
-  border-radius: var(--radius);
-  color: #fff;
-  cursor: pointer;
-  transition: 0.25s ease;
+.btn-primary,
+.btn-secondary {
+    padding: 12px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-family: "Inconsolata", monospace;
+    transition: transform 0.15s ease, background 0.2s ease;
 }
 
-/* ==============================
-   Terminal
-============================== */
+.btn-primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+/* Hover Animation */
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: scale(1.05);
+    filter: brightness(1.15);
+}
+
+/* Click Animation */
+.btn-primary:active,
+.btn-secondary:active {
+    transform: scale(0.92);
+    filter: brightness(0.8);
+}
+
+.btn-secondary {
+    background: var(--panel);
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+}
+
+.info {
+    color: var(--muted);
+    font-size: 14px;
+}
+
 .terminal {
-  background: #0d0f16;
-  border-radius: var(--radius);
-  padding: 20px;
-  height: 380px;
-  margin-top: 20px;
-  overflow-y: auto;
-  font-size: 14px;
-  box-shadow: 0 0 12px #0006 inset;
+    background: var(--panel);
+    height: 320px;
+    border-radius: 8px;
+    margin-top: 20px;
+    padding: 10px;
+    overflow-y: auto;
 }
 
-.tx {
-  padding: 10px 0;
-  border-bottom: 1px solid #1a1a25;
+.card {
+    background: var(--panel);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
 }
 
-.tx .hash {
-  font-weight: bold;
-  color: var(--neon-cyan);
-  margin-bottom: 5px;
+.card-title {
+    color: var(--accent);
+    font-family: "Orbitron";
 }
 
-.tx .meta {
-  font-size: 13px;
-  color: var(--muted);
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
 }
 
-.actions {
-  margin-top: 6px;
-  display: flex;
-  gap: 8px;
-}
-
-.btn-ghost {
-  background: #1b1b24;
-  border: 1px solid #333;
-  padding: 5px 10px;
-  font-size: 13px;
-  color: var(--txt);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-/* ==============================
-   Snapshot
-============================== */
-.snapshot {
-  margin-top: 10px;
-  font-size: 15px;
-}
-
-.snapshot-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #222430;
+.btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
 }
 
 .badge-in {
-  background: var(--neon-cyan);
-  padding: 4px 10px;
-  color: black;
-  font-weight: bold;
-  border-radius: 20px;
+    color: var(--accent2);
 }
 
 .badge-out {
-  background: var(--neon-pink);
-  padding: 4px 10px;
-  color: black;
-  font-weight: bold;
-  border-radius: 20px;
+    color: var(--accent);
 }
-
-/* ==============================
-   Leaderboard Panel
-============================== */
-.leaderboard {
-  margin-top: 20px;
-  padding: 15px;
-  background: #0d0d17;
-  border-radius: var(--radius);
-  font-size: 15px;
-  color: var(--muted);
-}
-
-/* ======================================================
-   🔥 BUTTON ANIMATIONS — NEON HOVER + CLICK
-====================================================== */
-button.action,
-.copy button,
-.btn-ghost {
-  transition: 0.25s ease;
-}
-
-/* Hover */
-button.action:hover,
-.copy button:hover,
-.btn-ghost:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 12px var(--neon-cyan);
-  opacity: 0.95;
-}
-
-/* Click */
-button.action:active,
-.copy button:active,
-.btn-ghost:active {
-  transform: scale(0.92);
-  box-shadow: 0 0 18px var(--neon-pink);
-  transition: 0.12s;
-}
-
