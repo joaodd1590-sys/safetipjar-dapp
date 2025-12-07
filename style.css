@@ -1,193 +1,306 @@
-/* GLOBAL RESET */
+/* ===========================================
+   GLOBAL THEME
+=========================================== */
+:root {
+  --bg: #05030a;
+  --neon-cyan: #6cf2c2;
+  --neon-pink: #ff4db8;
+  --muted: #8f98a6;
+  --accent: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+}
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
-  font-family: Inter, sans-serif;
 }
 
 body {
-  background: #0c0c0f;
-  color: #e3e3e3;
-  text-align: center;
-  padding: 30px;
+  margin: 0;
+  background: linear-gradient(180deg, #02020a, var(--bg));
+  font-family: Inconsolata, monospace;
+  color: #e6eef6;
 }
 
-/* TITLES */
-.title {
-  color: #0fffd8;
-  font-size: 32px;
-  font-weight: 700;
+/* ===========================================
+   MAIN GRID WRAPPER
+=========================================== */
+.wrap {
+  max-width: 1200px;
+  margin: 28px auto;
+  padding: 22px;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 22px;
 }
 
-.subtitle {
-  color: #a7a7a7;
-  margin-top: 6px;
-  font-size: 14px;
+/* ===========================================
+   PANELS
+=========================================== */
+.panel {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid rgba(108, 242, 194, 0.04);
 }
 
-/* INPUT AREA */
-.input-area {
+.snapshot-panel {
+  height: fit-content;
+  align-self: flex-start;
+}
+
+/* ===========================================
+   TITLES
+=========================================== */
+.term-title {
+  font-family: Orbitron;
+  color: var(--neon-cyan);
+  font-size: 22px;
+}
+
+.term-sub {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ===========================================
+   INPUT + BUTTON
+=========================================== */
+.input-row {
   display: flex;
-  justify-content: center;
   gap: 10px;
-  margin: 30px auto;
-  width: 100%;
-  max-width: 650px;
+  margin: 14px 0 18px 0;
 }
 
-input {
+input.address {
   flex: 1;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 8px;
   border: none;
-  background: #1d1d23;
-  color: white;
+  background: rgba(0, 0, 0, 0.35);
+  color: #e6eef6;
+}
+
+button.action {
+  min-width: 160px;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #041017;
+  font-weight: 700;
+  cursor: pointer;
   font-size: 15px;
 }
 
-input:focus {
-  outline: 2px solid #0fffd8;
-}
-
-/* BUTTONS */
-.btn-primary {
-  background: #30ffd0;
-  border: none;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  color: #000;
-  transition: 0.2s;
-}
-
-.btn-primary:hover {
-  background: #6affea;
-  transform: scale(1.05);
-}
-
-.btn-secondary {
-  background: #1d1d23;
-  padding: 10px 18px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  cursor: pointer;
-  color: #e3e3e3;
-  transition: 0.2s;
-}
-
-.btn-secondary:hover {
-  background: #2e2e35;
-  transform: scale(1.05);
-}
-
-/* SUMMARY CARD */
-.card {
-  background: #111116;
-  border-radius: 16px;
-  padding: 28px;
-  margin: 30px auto;
-  max-width: 850px;
-  text-align: left;
-  box-shadow: 0 0 25px rgba(0, 255, 200, 0.08);
-}
-
-.summary h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #0fffd8;
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.summary-buttons {
+/* ===========================================
+   SUMMARY BOXES
+=========================================== */
+.summary {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
-/* TERMINAL */
+.stat {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+  border-radius: 8px;
+  min-width: 150px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.stat .label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stat .num {
+  color: var(--neon-cyan);
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+/* ===========================================
+   TRANSACTION TERMINAL
+=========================================== */
 .terminal {
-  max-width: 850px;
-  margin: 20px auto;
-  padding: 10px;
-  min-height: 150px;
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 260px;
+  max-height: 480px;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
+/* Scroll bonito */
+.terminal::-webkit-scrollbar {
+  width: 8px;
+}
+.terminal::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+/* ===========================================
+   TRANSACTION ROWS
+=========================================== */
 .tx {
-  background: #16161d;
-  padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  padding: 10px 4px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
-  border: 1px solid #23232b;
-  transition: 0.2s;
+  gap: 12px;
+  align-items: center;
 }
 
-.tx:hover {
-  transform: scale(1.01);
-  border-color: #3b3b45;
+.tx .left {
+  flex: 1;
+  min-width: 0;
 }
 
 .hash {
-  color: #0fffd8;
-  font-size: 13px;
+  color: var(--neon-pink);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 550px;
 }
 
 .meta {
-  color: #aaa;
+  color: var(--muted);
   font-size: 12px;
-  margin-top: 5px;
+  margin-top: 6px;
 }
 
 .actions {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  align-items: center;
 }
 
-.btn-ghost {
-  background: transparent;
-  border: 1px solid #444;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
+/* ===========================================
+   BADGES IN / OUT — (Centralized Perfectly)
+=========================================== */
+.badge-in,
+.badge-out {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 50px;
+  height: 30px;
+
+  padding: 0 12px;
+  border-radius: 18px;
+
+  font-weight: 700;
+  font-size: 12px;
+  color: #041017;
+
+  white-space: nowrap;
 }
 
-.btn-ghost:hover {
-  background: #2e2e35;
-}
-
-/* BADGES */
 .badge-in {
-  background:#00ff9c;
-  padding: 3px 8px;
-  border-radius: 6px;
-  color:#000;
-  font-size: 11px;
-  font-weight: bold;
+  background: linear-gradient(90deg, #00ffad, #6cf2c2);
 }
 
 .badge-out {
-  background:#ff6b6b;
-  padding: 3px 8px;
-  border-radius: 6px;
-  color:#000;
-  font-size: 11px;
-  font-weight: bold;
+  background: linear-gradient(90deg, #ff4db8, #ff9bd1);
 }
 
-/* LEADERBOARD */
-.leaderboard {
-  text-align:center;
-  color:#aaa;
+/* ===========================================
+   SIMPLE BUTTONS
+=========================================== */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* ===========================================
+   SNAPSHOT
+=========================================== */
+.side-title {
+  font-family: Orbitron;
+  color: var(--neon-pink);
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.snapshot {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.snapshot .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.snapshot .row:last-child {
+  border-bottom: none;
+}
+
+.copy {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.copy button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #041017;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ===========================================
+   LEADERBOARD — COMING SOON
+=========================================== */
+.lb-coming {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.lb-coming-title {
+  font-family: Orbitron;
+  font-size: 17px;
+  color: var(--neon-cyan);
+}
+
+.lb-coming-sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* ===========================================
+   RESPONSIVE
+=========================================== */
+@media (max-width: 980px) {
+  .wrap {
+    grid-template-columns: 1fr;
+  }
 }
