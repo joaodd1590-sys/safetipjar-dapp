@@ -31,7 +31,7 @@ function clearTerminal() {
 
 function appendTx(tx, wallet) {
   const isOut = tx.from.toLowerCase() === wallet.toLowerCase();
-  const badge = isOut 
+  const badge = isOut
     ? `<span class="badge-out">OUT</span>`
     : `<span class="badge-in">IN</span>`;
 
