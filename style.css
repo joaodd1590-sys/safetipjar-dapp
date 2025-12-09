@@ -16,8 +16,12 @@ body {
   font-family: system-ui, sans-serif;
 }
 
+.hidden {
+  display: none;
+}
+
 .app-shell {
-  max-width: 760px;
+  max-width: 780px;
   margin: 30px auto;
   padding: 0 16px;
 }
@@ -31,7 +35,6 @@ body {
   color: var(--text-muted);
 }
 
-/* CARD */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -40,7 +43,6 @@ body {
   margin-bottom: 18px;
 }
 
-/* INPUT */
 .input-wrapper {
   display: flex;
   gap: 10px;
@@ -69,7 +71,6 @@ body {
   background: var(--accent-hover);
 }
 
-/* SNAPSHOT */
 .result-row {
   display: flex;
   justify-content: space-between;
@@ -77,22 +78,10 @@ body {
   border-bottom: 1px dashed var(--border);
 }
 
-.result-row:last-child {
-  border-bottom: none;
-}
-
-.label {
-  color: var(--text-muted);
-}
-
-.value {
-  font-weight: 600;
-}
-
 .snapshot-actions {
+  margin-top: 12px;
   display: flex;
   gap: 10px;
-  margin-top: 14px;
 }
 
 .btn-secondary {
@@ -112,60 +101,72 @@ body {
 .terminal {
   background: #0d111c;
   border: 1px solid var(--border);
-  padding: 12px;
+  padding: 15px;
   border-radius: 10px;
-  max-height: 420px;
+  max-height: 460px;
   overflow-y: auto;
 }
 
+/* NOVO LAYOUT PROFISSIONAL */
 .tx {
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
   background: #131a2c;
   border-radius: 10px;
   border: 1px solid var(--border);
 }
 
-.hash {
+.tx-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addresses {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.addr-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.addr-value {
   font-size: 13px;
   font-weight: 600;
 }
 
-.meta {
+.badge-in, .badge-out {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 800;
   font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.actions {
-  margin-top: 8px;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.badge-out,
-.badge-in {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.badge-out {
-  background: #ff3b3b;
-  color: white;
 }
 
 .badge-in {
   background: #2ecc71;
-  color: black;
+  color: #000;
 }
 
-.app-footer {
-  text-align: center;
-  margin-top: 12px;
+.badge-out {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+.tx-bottom {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tx-meta {
   font-size: 12px;
   color: var(--text-muted);
+}
+
+.tx-actions button {
+  margin-left: 6px;
 }
