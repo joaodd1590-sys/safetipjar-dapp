@@ -1,341 +1,233 @@
-/* ===========================================
-   GLOBAL THEME
-=========================================== */
 :root {
-  --bg: #05030a;
-  --neon-cyan: #6cf2c2;
-  --neon-pink: #ff4db8;
-  --muted: #8f98a6;
-  --accent: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-}
-
-* {
-  box-sizing: border-box;
+  --bg: #0b0f1a;
+  --card: #111623;
+  --border: #1e2738;
+  --accent: #1d9bf0;
+  --accent-hover: #4ab3ff;
+  --text-main: #ffffff;
+  --text-muted: #9ba3b5;
 }
 
 body {
   margin: 0;
-  background: var(--bg); /* cor única no background */
-  font-family: Inconsolata, monospace;
-  color: #e6eef6;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: system-ui, sans-serif;
 }
 
-/* ===========================================
-   MAIN GRID WRAPPER
-=========================================== */
-.wrap {
-  max-width: 1200px;
-  margin: 28px auto;
-  padding: 22px;
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 22px;
+.hidden {
+  display: none;
 }
 
-/* ===========================================
-   PANELS
-=========================================== */
-.panel {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  padding: 18px;
-  border: 1px solid rgba(108, 242, 194, 0.08);
+.app-shell {
+  max-width: 780px;
+  margin: 30px auto;
+  padding: 0 16px;
 }
 
-.snapshot-panel {
-  height: fit-content;
-  align-self: flex-start;
+.app-header {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-/* ===========================================
-   TITLES
-=========================================== */
-.term-title {
-  font-family: Orbitron;
-  color: var(--neon-cyan);
-  font-size: 22px;
-}
-
-.term-sub {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 4px;
-}
-
-/* pequeno texto */
-.small {
+.subtitle {
+  color: var(--text-muted);
   margin-top: 6px;
-  color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 
-/* ===========================================
-   INPUT + RUN BUTTON
-=========================================== */
-.input-row {
+/* CARDS */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+
+/* INPUT */
+.input-wrapper {
   display: flex;
   gap: 10px;
-  margin: 16px 0 18px 0;
 }
 
-input.address {
+#addr {
   flex: 1;
   padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(0, 0, 0, 0.35);
-  color: #e6eef6;
-}
-
-input.address::placeholder {
-  color: #5f6772;
-}
-
-/* Botões principais (Run Scan, Copy, Explorer) */
-.action,
-.btn-primary {
-  position: relative;
-  min-width: 150px;
-  padding: 12px 18px;
-  border-radius: 999px;
-  border: none;
-  background-image: var(--accent);
-  background-size: 200% 100%;
-  background-position: 0% 0%;
-  color: #041017;
-  font-weight: 700;
-  cursor: pointer;
-  font-size: 14px;
-  text-align: center;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background-position 0.3s ease,
-    filter 0.15s ease;
-}
-
-/* Hover: brilho e leve “flutuar” */
-.action:hover,
-.btn-primary:hover {
-  transform: translateY(-1px);
-  background-position: 100% 0%;
-  box-shadow: 0 0 22px rgba(255, 77, 184, 0.35);
-  filter: brightness(1.05);
-}
-
-/* Clique: “apertar” */
-.action:active,
-.btn-primary:active {
-  transform: scale(0.96);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-  filter: brightness(1.15);
-}
-
-/* ===========================================
-   SUMMARY BOXES
-=========================================== */
-.summary {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-.stat {
-  background: rgba(255, 255, 255, 0.02);
-  padding: 12px;
-  border-radius: 8px;
-  min-width: 150px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-.stat .label {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.stat .num {
-  color: var(--neon-cyan);
-  font-weight: 700;
-  margin-top: 6px;
-}
-
-/* ===========================================
-   TRANSACTION TERMINAL
-=========================================== */
-.terminal {
-  margin-top: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  background: #161d2e;
+  color: var(--text-main);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 12px;
-  min-height: 260px;
-  max-height: 480px;
-  overflow: auto;
-  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Scroll bonitinho */
-.terminal::-webkit-scrollbar {
-  width: 8px;
-}
-.terminal::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
-/* ===========================================
-   TRANSACTION ROWS
-=========================================== */
-.tx {
-  padding: 10px 4px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-}
-
-.tx .left {
-  flex: 1;
-  min-width: 0;
-}
-
-.hash {
-  color: var(--neon-pink);
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 550px;
-}
-
-.meta {
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 6px;
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-/* Botões “fantasma” dentro das transações */
-.btn-ghost {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  padding: 8px 12px;
-  border-radius: 999px;
-  color: var(--muted);
+#check {
+  padding: 12px 18px;
+  background: var(--accent);
+  color: #000;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 12px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  font-weight: 600;
+  border: none;
 }
 
-.btn-ghost:hover {
-  transform: translateY(-1px);
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 10px rgba(108, 242, 194, 0.35);
+#check:hover {
+  background: var(--accent-hover);
 }
 
-.btn-ghost:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
-}
-
-/* ===========================================
-   BADGES IN / OUT
-=========================================== */
-.badge-in,
-.badge-out {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 50px;
-  height: 26px;
-  padding: 0 12px;
-  border-radius: 18px;
-  font-weight: 700;
-  font-size: 11px;
-  color: #041017;
-  white-space: nowrap;
-}
-
-.badge-in {
-  background: linear-gradient(90deg, #00ffad, #6cf2c2);
-}
-
-.badge-out {
-  background: linear-gradient(90deg, #ff4db8, #ff9bd1);
-}
-
-/* ===========================================
-   SNAPSHOT (RIGHT PANEL)
-=========================================== */
-.side-title {
-  font-family: Orbitron;
-  color: var(--neon-pink);
-  font-size: 18px;
-  margin-bottom: 8px;
-}
-
-.snapshot {
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.snapshot .row {
+/* SNAPSHOT */
+.result-row {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  border-bottom: 1px dashed var(--border);
 }
 
-.snapshot .row:last-child {
-  border-bottom: none;
-}
-
-.copy {
-  margin-top: 14px;
+.snapshot-actions {
+  margin-top: 12px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* Leaderboard card */
-.lb-coming {
-  margin-top: 18px;
-  padding: 16px;
+/* ACTIVE STATUS */
+.active-yes {
+  color: #2ecc71;
+  font-weight: 700;
+}
+
+.active-no {
+  color: #ff4d4d;
+  font-weight: 700;
+}
+
+/* BUTTONS SEC */
+.btn-secondary {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #1b2333;
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #27334b;
+}
+
+/* TERMINAL */
+.terminal {
+  background: #0d111c;
+  border: 1px solid var(--border);
+  padding: 15px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  max-height: 460px;
+  overflow-y: auto;
 }
 
-.lb-coming-title {
-  font-family: Orbitron;
-  font-size: 17px;
-  color: var(--neon-cyan);
+/* BEAUTIFUL SCROLLBAR */
+.terminal::-webkit-scrollbar {
+  width: 8px;
+}
+.terminal::-webkit-scrollbar-track {
+  background: #0b0f1a;
+  border-radius: 10px;
+}
+.terminal::-webkit-scrollbar-thumb {
+  background: #1d9bf0;
+  border-radius: 10px;
+}
+.terminal::-webkit-scrollbar-thumb:hover {
+  background: #4ab3ff;
+}
+.terminal {
+  scrollbar-color: #1d9bf0 #0b0f1a;
+  scrollbar-width: thin;
 }
 
-.lb-coming-sub {
-  color: var(--muted);
+/* TX BOX */
+.tx {
+  padding: 14px;
+  margin-bottom: 12px;
+  background: #131a2c;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.tx-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addresses {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.addr-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.addr-value {
   font-size: 13px;
-  margin-top: 6px;
-  line-height: 1.4;
+  font-weight: 600;
 }
 
-/* ===========================================
-   RESPONSIVE
-=========================================== */
-@media (max-width: 980px) {
-  .wrap {
-    grid-template-columns: 1fr;
+.badge-in, .badge-out {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.badge-in {
+  background: #2ecc71;
+  color: #000;
+}
+
+.badge-out {
+  background: #ff4d4d;
+  color: #fff;
+}
+
+.tx-bottom {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tx-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tx-actions button {
+  margin-left: 6px;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 520px) {
+
+  .tx-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 
-  .snapshot-panel {
-    order: -1;
+  .tx-bottom {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .input-wrapper {
+    flex-direction: column;
+  }
+
+  #check {
+    width: 100%;
   }
 }
