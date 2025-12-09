@@ -1,4 +1,5 @@
-// Simple ARC wallet activity checker
+// ARC Testnet Live API Integration
+// BY JOÃO — versão final
 
 const addrInput     = document.getElementById("addr");
 const checkBtn      = document.getElementById("check");
@@ -9,17 +10,23 @@ const snapActiveEl  = document.getElementById("snapActive");
 const copyLinkBtn   = document.getElementById("copyLink");
 const openExpBtn    = document.getElementById("openExplorer");
 
-// clear terminal output
+// limpar janela
 function clearTerminal() {
   terminal.innerHTML = "";
 }
 
-// shorten address for UI
-function shortAddr(addr) {
-  return addr.slice(0, 6) + "..." + addr.slice(-4);
+// encurtar
+function shortAddr(a) {
+  return a.slice(0, 6) + "..." + a.slice(-4);
 }
 
-// render one transaction row
+// formatar timestamp
+function formatTime(ts) {
+  const d = new Date(ts * 1000);
+  return d.toLocaleString("pt-BR");
+}
+
+// renderizar um tx
 function appendTx(tx, wallet) {
   const row = document.createElement("div");
   row.className = "tx";
@@ -29,88 +36,97 @@ function appendTx(tx, wallet) {
     ? `<span class="badge-out">OUT</span>`
     : `<span class="badge-in">IN</span>`;
 
+  // link real
+  const explorerURL = `https://testnet.arcscan.app/tx/${tx.hash}`;
+
   row.innerHTML = `
     <div>
       <div class="hash">${tx.hash}</div>
-      <div class="meta">${tx.from} → ${tx.to} • ${tx.value} • ${tx.time}</div>
+      <div class="meta">
+        ${tx.from} → ${tx.to} • ${tx.value} ARC • ${formatTime(tx.timeStamp)}
+      </div>
     </div>
+
     <div class="actions">
       ${badge}
-      <button class="btn-secondary" onclick="navigator.clipboard.writeText('${tx.hash}')">Copy</button>
-      <button class="btn-secondary" onclick="window.open('${tx.link}', '_blank')">Explorer</button>
+      <button class="btn-secondary" onclick="navigator.clipboard.writeText('${tx.hash}')">
+        Copy
+      </button>
+      <button class="btn-secondary" onclick="window.open('${explorerURL}', '_blank')">
+        Explorer
+      </button>
     </div>
   `;
 
-  // newest on top
   terminal.prepend(row);
 }
 
-// main scan function
+// SCAN REAL
 async function runScan() {
   const wallet = addrInput.value.trim();
 
   if (!wallet.startsWith("0x") || wallet.length < 40) {
-    alert("Paste a valid Arc Testnet wallet.");
+    alert("Endereço inválido.");
     return;
   }
 
   terminal.innerHTML =
-    "<div style='color:#aaa;padding:10px;'>Scanning...</div>";
+    "<div style='color:#aaa;padding:10px;'>Carregando transações reais...</div>";
 
   snapWalletEl.textContent = shortAddr(wallet);
   snapTxEl.textContent = "0";
   snapActiveEl.innerHTML = `<span class="badge-out">No</span>`;
 
   try {
-    const res = await fetch(
-      `/api/activity?address=${encodeURIComponent(wallet)}`
-    );
+    // 🔥 API REAL ARC
+    const url = `https://testnet.arcscan.app/api?module=account&action=txlist&address=${wallet}`;
+    const res = await fetch(url);
     const data = await res.json();
-    const txs = data.transactions || [];
+
+    const txs = data.result || [];
+
+    // ordenar por timestamp crescente
+    txs.sort((a, b) => Number(a.timeStamp) - Number(b.timeStamp));
+
+    clearTerminal();
 
     snapTxEl.textContent = txs.length;
     snapActiveEl.innerHTML = txs.length
       ? `<span class="badge-in">Yes</span>`
       : `<span class="badge-out">No</span>`;
 
-    clearTerminal();
-
     if (!txs.length) {
       terminal.innerHTML =
-        "<div style='color:#aaa;padding:10px;'>No transactions found.</div>";
+        "<div style='color:#aaa;padding:10px;'>Nenhuma transação encontrada.</div>";
       return;
     }
 
-    txs.forEach((tx) => appendTx(tx, wallet));
+    txs.forEach((tx) => {
+      appendTx(tx, wallet);
+    });
   } catch (err) {
     console.error(err);
     terminal.innerHTML =
-      "<div style='color:#aaa;padding:10px;'>Network error.</div>";
+      "<div style='color:#aaa;padding:10px;'>Erro ao conectar na API.</div>";
   }
 }
 
-// button + Enter key
 checkBtn.onclick = runScan;
 addrInput.addEventListener("keyup", (e) => {
   if (e.key === "Enter") runScan();
 });
 
-// shareable link with current address
+// copy link
 copyLinkBtn.onclick = () => {
   const wallet = addrInput.value.trim();
-  const url = `${location.origin}${location.pathname}?addr=${encodeURIComponent(
-    wallet
-  )}`;
+  const url = `${location.origin}${location.pathname}?addr=${encodeURIComponent(wallet)}`;
   navigator.clipboard.writeText(url);
-  alert("Copied!");
+  alert("Copiado!");
 };
 
-// open explorer for current address
+// explorer
 openExpBtn.onclick = () => {
   const wallet = addrInput.value.trim();
   if (!wallet) return;
-  window.open(
-    `https://testnet.arcscan.app/address/${encodeURIComponent(wallet)}`,
-    "_blank"
-  );
+  window.open(`https://testnet.arcscan.app/address/${wallet}`, "_blank");
 };
