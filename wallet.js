@@ -1,5 +1,4 @@
-// ARC Testnet Live API Integration
-// BY JOÃO — versão final
+// ARC Testnet USDC (ERC-20) Live Integration
 
 const addrInput     = document.getElementById("addr");
 const checkBtn      = document.getElementById("check");
@@ -10,58 +9,61 @@ const snapActiveEl  = document.getElementById("snapActive");
 const copyLinkBtn   = document.getElementById("copyLink");
 const openExpBtn    = document.getElementById("openExplorer");
 
-// limpar janela
+const USDC_CONTRACT = "0x3600000000000000000000000000000000000000";
+
+// limpar
 function clearTerminal() {
   terminal.innerHTML = "";
 }
 
-// encurtar
+// endereço curto
 function shortAddr(a) {
   return a.slice(0, 6) + "..." + a.slice(-4);
 }
 
-// formatar timestamp
+// timestamp → data formatada
 function formatTime(ts) {
   const d = new Date(ts * 1000);
   return d.toLocaleString("pt-BR");
 }
 
-// renderizar um tx
+// converter USDC (6 decimals)
+function formatUSDC(raw) {
+  return (Number(raw) / 1e6).toFixed(2);
+}
+
+// render tx
 function appendTx(tx, wallet) {
   const row = document.createElement("div");
   row.className = "tx";
 
-  const isOut = tx.from?.toLowerCase() === wallet.toLowerCase();
+  const isOut = tx.from.toLowerCase() === wallet.toLowerCase();
   const badge = isOut
     ? `<span class="badge-out">OUT</span>`
     : `<span class="badge-in">IN</span>`;
 
-  // link real
   const explorerURL = `https://testnet.arcscan.app/tx/${tx.hash}`;
+  const value = formatUSDC(tx.value);
 
   row.innerHTML = `
     <div>
       <div class="hash">${tx.hash}</div>
       <div class="meta">
-        ${tx.from} → ${tx.to} • ${tx.value} ARC • ${formatTime(tx.timeStamp)}
+        ${tx.from} → ${tx.to} • ${value} USDC • ${formatTime(tx.timeStamp)}
       </div>
     </div>
 
     <div class="actions">
       ${badge}
-      <button class="btn-secondary" onclick="navigator.clipboard.writeText('${tx.hash}')">
-        Copy
-      </button>
-      <button class="btn-secondary" onclick="window.open('${explorerURL}', '_blank')">
-        Explorer
-      </button>
+      <button class="btn-secondary" onclick="navigator.clipboard.writeText('${tx.hash}')">Copy</button>
+      <button class="btn-secondary" onclick="window.open('${explorerURL}', '_blank')">Explorer</button>
     </div>
   `;
 
   terminal.prepend(row);
 }
 
-// SCAN REAL
+// MAIN SCAN
 async function runScan() {
   const wallet = addrInput.value.trim();
 
@@ -71,21 +73,21 @@ async function runScan() {
   }
 
   terminal.innerHTML =
-    "<div style='color:#aaa;padding:10px;'>Carregando transações reais...</div>";
+    "<div style='color:#aaa;padding:10px;'>Carregando transações USDC...</div>";
 
   snapWalletEl.textContent = shortAddr(wallet);
   snapTxEl.textContent = "0";
   snapActiveEl.innerHTML = `<span class="badge-out">No</span>`;
 
   try {
-    // 🔥 API REAL ARC
-    const url = `https://testnet.arcscan.app/api?module=account&action=txlist&address=${wallet}`;
+    // 🔥 API REAL ERC-20 USDC
+    const url = `https://testnet.arcscan.app/api?module=account&action=tokentx&contractaddress=${USDC_CONTRACT}&address=${wallet}`;
     const res = await fetch(url);
     const data = await res.json();
 
     const txs = data.result || [];
 
-    // ordenar por timestamp crescente
+    // ordenar por data crescente
     txs.sort((a, b) => Number(a.timeStamp) - Number(b.timeStamp));
 
     clearTerminal();
@@ -97,17 +99,15 @@ async function runScan() {
 
     if (!txs.length) {
       terminal.innerHTML =
-        "<div style='color:#aaa;padding:10px;'>Nenhuma transação encontrada.</div>";
+        "<div style='color:#aaa;padding:10px;'>Nenhuma transação USDC encontrada.</div>";
       return;
     }
 
-    txs.forEach((tx) => {
-      appendTx(tx, wallet);
-    });
+    txs.forEach((tx) => appendTx(tx, wallet));
   } catch (err) {
     console.error(err);
     terminal.innerHTML =
-      "<div style='color:#aaa;padding:10px;'>Erro ao conectar na API.</div>";
+      "<div style='color:#aaa;padding:10px;'>Erro ao conectar à API.</div>";
   }
 }
 
@@ -116,7 +116,7 @@ addrInput.addEventListener("keyup", (e) => {
   if (e.key === "Enter") runScan();
 });
 
-// copy link
+// shareable link
 copyLinkBtn.onclick = () => {
   const wallet = addrInput.value.trim();
   const url = `${location.origin}${location.pathname}?addr=${encodeURIComponent(wallet)}`;
@@ -124,7 +124,7 @@ copyLinkBtn.onclick = () => {
   alert("Copiado!");
 };
 
-// explorer
+// abrir explorer
 openExpBtn.onclick = () => {
   const wallet = addrInput.value.trim();
   if (!wallet) return;
