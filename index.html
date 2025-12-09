@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARC Activity Scanner</title>
+  <title>USDC ARC Explorer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -12,8 +12,8 @@
   <div class="app-shell">
 
     <header class="app-header">
-      <h1>ARC Activity Scanner</h1>
-      <p class="subtitle">Track ARC Testnet user activity via public API</p>
+      <h1>USDC Activity Scanner</h1>
+      <p class="subtitle">ARC Testnet · ERC-20 USDC</p>
     </header>
 
     <!-- INPUT CARD -->
@@ -24,39 +24,44 @@
       </div>
     </section>
 
-    <!-- SNAPSHOT -->
-    <section class="card snapshot-card">
-      <h2>Wallet Snapshot</h2>
+    <!-- SNAPSHOT + TXS (INICIALMENTE ESCONDIDO) -->
+    <div id="resultsContainer" class="hidden">
 
-      <div class="result-row">
-        <span class="label">Wallet</span>
-        <span id="snapWallet" class="value">-</span>
-      </div>
+      <!-- SNAPSHOT -->
+      <section class="card snapshot-card">
+        <h2>Wallet Snapshot</h2>
 
-      <div class="result-row">
-        <span class="label">Total TXs</span>
-        <span id="snapTx" class="value">0</span>
-      </div>
+        <div class="result-row">
+          <span class="label">Wallet</span>
+          <span id="snapWallet" class="value">-</span>
+        </div>
 
-      <div class="result-row">
-        <span class="label">Active?</span>
-        <span id="snapActive" class="value">No</span>
-      </div>
+        <div class="result-row">
+          <span class="label">Total TXs</span>
+          <span id="snapTx" class="value">0</span>
+        </div>
 
-      <div class="snapshot-actions">
-        <button id="copyLink" class="btn-secondary">Copy Link</button>
-        <button id="openExplorer" class="btn-secondary">Open Explorer</button>
-      </div>
-    </section>
+        <div class="result-row">
+          <span class="label">Active?</span>
+          <span id="snapActive" class="value">No</span>
+        </div>
 
-    <!-- TERMINAL CARD -->
-    <section class="card">
-      <h2>Transactions</h2>
-      <div id="terminal" class="terminal"></div>
-    </section>
+        <div class="snapshot-actions">
+          <button id="copyLink" class="btn-secondary">Copy Link</button>
+          <button id="openExplorer" class="btn-secondary">Open Explorer</button>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="card">
+        <h2>Transactions</h2>
+        <div id="terminal" class="terminal"></div>
+      </section>
+
+    </div>
 
     <footer class="app-footer">
-      Built by João Carlos · ARC community tool
+      Built by João Carlos · ARC Ecosystem
     </footer>
 
   </div>
