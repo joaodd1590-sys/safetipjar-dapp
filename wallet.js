@@ -152,3 +152,19 @@ openExpBtn.onclick = () => {
   const wallet = addrInput.value.trim();
   window.open(`https://testnet.arcscan.app/address/${wallet}`, "_blank");
 };
+// Cursor interactive background glow
+const glow = document.createElement("div");
+glow.className = "cursor-glow";
+document.body.appendChild(glow);
+
+let mouseX = 50;
+let mouseY = 50;
+
+document.addEventListener("mousemove", (e) => {
+  mouseX = (e.clientX / window.innerWidth) * 100;
+  mouseY = (e.clientY / window.innerHeight) * 100;
+
+  document.documentElement.style.setProperty("--x", `${mouseX}%`);
+  document.documentElement.style.setProperty("--y", `${mouseY}%`);
+});
+
